@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "ufv-bootcamp-2026",
+		"[python]": {
+			"editor.defaultFormatter": "ms-python.black-formatter"
+		},
+		"python.formatting.provider": "none"
+	}
+}
