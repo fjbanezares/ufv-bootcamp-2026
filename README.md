@@ -4,6 +4,7 @@ Repositorio central con recursos, ejercicios y proyectos del **Bootcamp UFV 2026
 
 ```
 .
+├── 📁 intro/      # Mentalidad, síndrome del impostor, uso de IA en estudio y cloud
 ├── 📁 linux/      # Scripts Shell/Bash, automatización y administración de sistemas
 ├── 📁 git/        # Guías de control de versiones, comandos y flujo colaborativo
 ├── 📁 python/     # Formación completa en Python (sintaxis, datos, POO, APIs, mini-juegos)
@@ -13,6 +14,12 @@ Repositorio central con recursos, ejercicios y proyectos del **Bootcamp UFV 2026
 ---
 
 ## 🗂️ Estructura del Repositorio
+ 
+### 🚀 [0. Intro & Mentalidad](./intro/)
+Superación del síndrome del impostor, uso pedagógico de herramientas de IA y mentalidad de aprendizaje técnico.
+- Guía interactiva de debate: **El Fantasma en la Pantalla Negra**.
+- Serie visual de 9 infografías anti-impostor.
+- Buenas prácticas de Inteligencia Artificial para el estudio.
 
 ### 🐧 [1. Linux](./linux/)
 Comandos esenciales de la terminal, gestión de procesos, permisos y scripts de automatización en Bash.
