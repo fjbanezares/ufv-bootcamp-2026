@@ -129,6 +129,7 @@ env.bak/
 venv.bak/
 bootcamp/
 gemini_env/
+laboratorio_nemesis/
 
 # Spyder project settings
 .spyderproject
