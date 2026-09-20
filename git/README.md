@@ -2,6 +2,11 @@
 
 Espacio dedicado al aprendizaje y consulta de flujos de trabajo con Git y plataformas como GitHub.
 
+## 🚀 Prácticas y Retos
+- **[🎬 Práctica Inception (Ramas y Merge)](./practica-inception/README.md)**: Ejercicio guiado para crear una rama (`feature/...`), mejorar el script de ámbitos y niveles de sueño de Python, mergear a `main` y pushear a GitHub.
+
+---
+
 ## Flujo Básico de Trabajo
 1. **Estado y cambios**:
    ```bash
