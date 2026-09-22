@@ -9,14 +9,15 @@ Bienvenido al espacio de **Control de Versiones con Git y GitHub**. Aquí encont
 ### 1. 📖 [Curso Profundo: Git Desde Cero (Manual Interactivo)](./CURSO_GIT_DESDE_CERO.md)
 Guía extensa y didáctica dividida en 10 módulos con explicaciones internas (*blobs, trees, commits, DAG*) y **mini-prácticas flash paso a paso** para ejecutar directamente en la terminal.
 
-### 2. 🎨 [Serie Visual: Git Desde Cero (10 Láminas Infográficas)](./git%20crash%20course/)
-Colección completa de 10 infografías en alta resolución que condensan cada concepto:
+### 2. 🎨 [Serie Visual: Git Desde Cero (11 Láminas Infográficas)](./git%20crash%20course/)
+Colección completa de láminas visuales en alta resolución que condensan cada concepto:
+- **[Evolución Histórica](./git%20crash%20course/git_remotos_svn_vs_git.png)**: Arquitectura Distribuida (Git) vs Centralizada (Subversion / SVN) y Colaboración Remota.
 1. **[Parte 1](./git%20crash%20course/git1.png)**: ¿Por qué existe Git y qué problema resuelve?
 2. **[Parte 2](./git%20crash%20course/git2.png)**: Git Internals: cómo guarda la información (Blobs, Trees, Commits y DAG).
-3. **[Parte 3](./git%20crash%20course/git3.png)**: Flujo diario: Working Directory, Staging Area y Repository.
+3. **[Parte 3](./git%20crash%20course/git3.png)**: Flujo diario: Working Directory, Staging Area, Repository y `.gitignore`.
 4. **[Parte 4](./git%20crash%20course/git4.png)**: Stage vs Stash: guardar sin perder el hilo.
 5. **[Parte 5](./git%20crash%20course/git5.png)**: Ramas (branches), merges y resolución de conflictos.
-6. **[Parte 6](./git%20crash%20course/git6.png)**: Remotos y colaboración (fetch, pull, push, pull requests).
+6. **[Parte 6](./git%20crash%20course/git6.png)**: Remotos, GitHub paso a paso, autenticación SSH/gh y colaboración.
 7. **[Parte 7](./git%20crash%20course/git7.png)**: Merges avanzados (Fast-forward, no-ff, squash y octopus).
 8. **[Parte 8](./git%20crash%20course/git8.png)**: HEAD, detached HEAD y viajar en el tiempo.
 9. **[Parte 9](./git%20crash%20course/git9.png)**: Rebase y rebase interactivo (`git rebase -i`).

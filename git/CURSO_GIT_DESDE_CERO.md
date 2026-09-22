@@ -46,6 +46,34 @@ Todos hemos pasado por esto: guardas un trabajo como `informe.doc`, luego `infor
 
 ---
 
+### 🏛️ Evolución Histórica: Centralizado (Subversion / SVN) vs Distribuido (Git)
+
+Para valorar el poder de Git, conviene entender la pesadilla que sufrían los programadores en los años 90 y principios de los 2000 con sistemas de control de versiones centralizados como **CVS** o **Apache Subversion (SVN)**.
+
+![Arquitectura Distribuida de Git vs Centralizada SVN](./git%20crash%20course/git_remotos_svn_vs_git.png)
+
+#### 1. Sistemas Centralizados (SVN / Subversion):
+- **El Servidor Único (*Single Point of Failure*):** Existe una única máquina central que almacena el repositorio y su historia.
+- **La Copia de Trabajo (*Working Copy*):** En tu ordenador solo descargas los archivos de la última versión. No tienes el historial de commits en tu disco.
+- **Dependencia absoluta de la conexión:** Para hacer un commit, para crear una rama o para ver el registro de cambios de hace tres meses, **necesitas internet y conexión obligatoria con el servidor central**.
+- **Si el servidor se cae:** Nadie en toda la empresa puede guardar versiones, nadie puede ramificar y, si el disco del servidor se corrompía sin copias de seguridad externas, **el proyecto entero moría para siempre**.
+- **Ramas pesadas y lentas:** En SVN, crear una rama consistía en duplicar físicamente una carpeta completa dentro del servidor (`/trunk` vs `/branches/mi_rama`). Era tan pesado que los equipos evitaban crear ramas.
+
+#### 2. Sistemas Distribuidos (Git):
+- **Todos son un servidor completo:** Cuando ejecutas `git clone`, no te descargas solo una foto del presente: **te descargas toda la base de datos con cada commit, cada rama y cada archivo desde el día cero del proyecto**.
+- **Autonomía total sin conexión (Offline-first):** Puedes estar en un vuelo transoceánico a 10.000 metros de altura sin WiFi y seguir trabajando con normalidad: haces 15 commits, creas 3 ramas, comparas diferencias con `git diff` e inspeccionas el log. Cuando vuelvas a tener red, te sincronizas.
+- **Seguridad redundante:** Cada miembro del equipo tiene una copia de seguridad perfecta e íntegra del proyecto en su portátil. Si los servidores de GitHub explotaran mañana, bastaría con que un solo desarrollador subiera su copia local a otro servidor para restaurar el 100% de la historia sin perder un solo byte.
+
+| Característica | Subversion (SVN) | Git (Distribuido) |
+| :--- | :--- | :--- |
+| **Arquitectura** | Cliente-Servidor Centralizado | Grafo Distribuido Peer-to-Peer |
+| **Trabajar sin internet** | Imposible hacer commits ni ver historial | Totalmente funcional offline |
+| **Creación de ramas** | Lenta y pesada (duplica carpetas) | Instantánea (un archivo de 41 bytes) |
+| **Velocidad de operaciones** | Lenta (consulta constante a la red) | Ultrarrápida (todo ocurre en disco local) |
+| **Copia de seguridad** | Solo en el servidor central | Cada clon es un backup completo del proyecto |
+
+---
+
 ### ⚡ Mini-Práctica Flash 1: Tu Primer Repositorio en 60 Segundos
 
 Abre tu terminal y ejecuta los siguientes comandos para crear un laboratorio de pruebas:
@@ -176,6 +204,56 @@ git commit -m "feat: añadir saludo inicial en app.py"
 
 # 6. Inspeccionamos el árbol de historia
 git log --oneline
+```
+
+---
+
+### 🛡️ El Escudo Protector: El Archivo `.gitignore`
+
+En el paso anterior dejamos un archivo llamado `config.env` sin agregar. ¿Qué pasaría si en un despiste ejecutas `git add .` y lo subes a un repositorio público en GitHub?
+- **El Peligro Real:** Existen bots automatizados rastreando los commits públicos de GitHub cada segundo buscando contraseñas, claves de API de OpenAI, credenciales de bases de datos o tarjetas de crédito. Si subes una clave privada, te la robarán en cuestión de segundos.
+- **La Basura que Pesa:** Además, subir entornos virtuales enteros (`.venv/`, `node_modules/`) o archivos temporales del sistema operativo (`.DS_Store`, `Thumbs.db`) solo añade gigabytes de basura inútil al repositorio.
+
+**La solución es `.gitignore`:**  
+Un archivo de texto plano en la raíz de tu proyecto donde le dices a Git: *"Ignora completamente estos archivos y carpetas; haz como si no existieran"*.
+
+#### Reglas de sintaxis de `.gitignore`:
+```gitignore
+# 1. Ignorar un archivo específico por su nombre
+config.env
+.env
+
+# 2. Ignorar por extensión (todos los archivos .log o .tmp)
+*.log
+*.tmp
+
+# 3. Ignorar una carpeta entera y todo su contenido (termina en /)
+node_modules/
+.venv/
+__pycache__/
+
+# 4. Excepción: ignorar todos los .txt EXCEPTO uno importante (con signo !)
+*.txt
+!importante.txt
+```
+
+#### ⚡ Mini-Práctica Flash 3.1: Blindando nuestro proyecto con `.gitignore`
+```bash
+# Comprueba que config.env sigue apareciendo en rojo
+git status
+
+# Creamos el archivo .gitignore y le decimos que ignore cualquier archivo .env
+echo "*.env" > .gitignore
+echo ".DS_Store" >> .gitignore
+
+# Volvemos a preguntar el estado
+git status
+```
+* **¡Observa la magia!**: `config.env` ha desaparecido por completo del radar de Git. Aunque hagas `git add .`, Git jamás lo agregará por error.
+```bash
+# Guardamos nuestro escudo .gitignore en el repositorio
+git add .gitignore
+git commit -m "chore: configurar .gitignore para proteger archivos sensibles"
 ```
 
 ---
@@ -320,11 +398,81 @@ git log --oneline --graph
 
 ![Parte 6: Remotos y colaboración](./git%20crash%20course/git6.png)
 
-### 🎯 La Idea en Humano
-Git es un sistema **distribuido**. Esto significa que tu ordenador tiene el 100% de la historia del proyecto; no necesita conexión a internet para hacer commits, ver logs ni crear ramas.  
-Los servidores remotos (como GitHub) actúan como el punto de encuentro del equipo.
+### 🎯 La Idea en Humano: Git vs GitHub
+Uno de los errores más comunes de quienes empiezan es confundir **Git** con **GitHub**:
+- **Git** es la herramienta de software libre (creada por Linus Torvalds en 2005) que vive en tu terminal y gestiona la máquina del tiempo de tus archivos locales.
+- **GitHub** (creado en 2008, adquirido por Microsoft en 2018) es una **plataforma en la nube** que aloja repositorios Git en internet. Actúa como el punto de reunión de equipos, tu portfolio profesional ante empresas y la sede del código abierto mundial.
+- *Analogía sencilla:* Git es el motor del coche; GitHub es la autopista y la estación de servicio por donde viajan y se conectan todos los coches.
 
-La regla mnemotécnica de los 3 verbos remotos:
+---
+
+### 🌐 Paso a Paso: Cómo Crear tu Cuenta en GitHub
+
+Si aún no tienes cuenta en GitHub, estos son los pasos para dejarla configurada con estándares de la industria:
+
+1. **Entra en el sitio oficial:** Ve a [github.com](https://github.com/) y haz clic en **Sign up**.
+2. **Introduce tu correo electrónico:** Te recomendamos usar un correo serio o académico que revises habitualmente.
+3. **Elige tu *Username* con cabeza:**  
+   Tu nombre de usuario (`github.com/tu-usuario`) aparecerá en las URLs de todos tus proyectos, en tus Pull Requests y en tu currículum. Evita apodos informales; un formato profesional suele ser `nombre-apellido` o `inicial-apellido` (ej. `fjbanezares`).
+4. **Verificación y Seguridad 2FA:**  
+   GitHub te enviará un código a tu correo. Una vez dentro, ve a **Settings ➔ Password and authentication** y activa la **autenticación en dos pasos (2FA)** mediante una app como Google Authenticator o 1Password (hoy en día es un requisito obligatorio de seguridad en GitHub).
+
+---
+
+### 🔑 El Gran Escollo: La Autenticación Moderna (¿Por qué la terminal rechaza mi contraseña?)
+
+Desde agosto de 2021, **GitHub eliminó el soporte de contraseñas de cuenta en la terminal** por razones de ciberseguridad. Si intentas hacer `git push` e introduces la contraseña con la que inicias sesión en la web, Git te soltará este frustrante error:  
+`remote: Support for password authentication was removed on August 13, 2021.`
+
+Para conectar tu terminal a GitHub de por vida sin este dolor de cabeza, existen dos vías oficiales:
+
+#### Vía A (Recomendada y ultrarrápida): Usar GitHub CLI (`gh`)
+Si tienes instalada la herramienta oficial de GitHub (`gh`), el inicio de sesión se hace en 10 segundos:
+```bash
+gh auth login
+```
+1. Eliges: **GitHub.com** ➔ **HTTPS** ➔ **Yes** (autenticar Git con credenciales de GitHub).
+2. Seleccionas **Login with a web browser**.
+3. Te dará un código de 8 letras; presionas Enter, se abre tu navegador, pegas el código y ¡listo! Tu terminal queda vinculada para siempre.
+
+#### Vía B (El estándar profesional clásico): Claves SSH
+La criptografía asimétrica SSH funciona como un candado y una llave:
+- La **clave privada** es tuya; se queda en tu ordenador y **jamás se comparte**.
+- La **clave pública** es el candado; se la entregas a GitHub. Cuando te conectas, ambos demuestran matemáticamente su identidad sin enviar contraseñas por internet.
+
+**Paso a paso para configurar tu clave SSH en 2 minutos:**
+```bash
+# 1. Genera un nuevo par de claves usando el algoritmo moderno ed25519:
+ssh-keygen -t ed25519 -C "tu_correo@ejemplo.com"
+# (Presiona Enter a todo para aceptar la ruta por defecto y pon una contraseña si lo deseas)
+
+# 2. Muestra tu clave pública para copiarla:
+cat ~/.ssh/id_ed25519.pub
+```
+3. Copia todo el texto que empieza por `ssh-ed25519 ...`.
+4. En GitHub: ve a tu foto de perfil arriba a la derecha ➔ **Settings** ➔ **SSH and GPG keys** ➔ haz clic en el botón verde **New SSH key**.
+5. Ponle un título (ej. `Mi Portatil MacBook`) y pega el texto en el campo **Key**.
+6. Comprueba que todo funciona ejecutando en tu terminal:
+   ```bash
+   ssh -T git@github.com
+   ```
+   Verás una bienvenida triunfal: *«Hi tu-usuario! You've successfully authenticated...»*.
+
+---
+
+### 👤 Configurar tu Firma Digital de Autor
+Antes de tu primer commit en cualquier máquina nueva, asegúrate de que Git sepa quién firma los cambios:
+```bash
+git config --global user.name "Tu Nombre y Apellido"
+git config --global user.email "tu_correo_de_github@ejemplo.com"
+```
+
+---
+
+### 🚀 La Danza de la Sincronización Remota
+
+Una vez autenticado, conectar tu máquina con el mundo se reduce a entender 3 verbos:
+
 > 👁️ **`git fetch` es MIRAR:** Consulta qué cambios hay en el servidor remoto y los descarga a tu máquina, pero **NO toca tus archivos locales**.  
 > 🔄 **`git pull` es ACTUALIZAR:** Es un `fetch` seguido de un `merge`. Trae los cambios remotos y los fusiona directamente en tu rama actual.  
 > 🚀 **`git push` es COMPARTIR:** Envía tus commits locales al servidor remoto para que tus compañeros puedan verlos.
