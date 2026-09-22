@@ -26,10 +26,11 @@ Comandos esenciales de la terminal, gestión de procesos, permisos y scripts de 
 - Script de gestión de recursos en nube / bash.
 - Chuleta de comandos y utilidades UNIX.
 
-### 🌿 [2. Git](./git/)
-Buenas prácticas en control de versiones y trabajo en equipo.
-- Flujos de trabajo con ramas (`branch`, `merge`, `rebase`).
-- Gestión de commits, resolución de conflictos y sincronización remota.
+### 🌿 [2. Git & GitHub](./git/)
+Control de versiones profesional, flujo de trabajo en equipo y arquitectura interna.
+- **[Curso Profundo: Git Desde Cero (Manual con Mini-Prácticas)](./git/CURSO_GIT_DESDE_CERO.md)**.
+- **Serie Visual de 10 Infografías**: De la máquina del tiempo a *rebase interactivo* y *internals*.
+- **Práctica Inception**: Ejercicio colaborativo con ramas, merge y resolución de conflictos.
 
 ### 🐍 [3. Python](./python/)
 El núcleo de programación del bootcamp con más de 25 bloques temáticos y proyectos prácticos:
