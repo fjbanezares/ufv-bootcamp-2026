@@ -169,42 +169,161 @@ Un mal commit mezcla 5 cosas no relacionadas: *"Cambié el botón de login, arre
 
 ---
 
-### ⚡ Mini-Práctica Flash 3: Dominando el Trío `status`, `diff` y `commit`
+### 🔍 La Lupa de Git: Entendiendo `git diff` a Fondo
 
+`git status` te dice **qué archivos** han cambiado de estado, pero `git diff` es la lupa quirúrgica que te enseña **qué líneas exactas** cambiaron (en verde lo añadido `+`, en rojo lo eliminado `-`).
+
+#### 1. ¿Qué es `git diff` en esencia?
+En la teoría interna de Git, un *diff* es simplemente una comparación entre **dos fotos o árboles de código (trees/commits)**.  
+Puedes usarlo para comparar dos momentos cualesquiera de tu historia o dos ramas:
+- `git diff commitA commitB` ➔ Compara dos fotos históricas concretas.
+- `git diff main desarrollo` ➔ Compara las diferencias completas entre dos ramas.
+
+#### 2. Los 3 atajos del día a día (Las 3 habitaciones de Git)
+Durante el desarrollo diario, no estás escribiendo hashes de commits todo el rato. Git te ofrece atajos relativos según dónde se encuentren tus cambios:
+
+```
+┌─────────────────────────┐             ┌─────────────────────┐             ┌─────────────────────────┐
+│ 1. Working Directory    │             │ 2. Staging Area     │             │ 3. Último Commit (HEAD) │
+│    (Archivos en disco)  │             │    (El escenario)   │             │    (Historial sellado)  │
+└───────────┬─────────────┘             └──────────┬──────────┘             └────────────┬────────────┘
+            │                                      │                                     │
+            └────────── git diff ──────────────────┘                                     │
+            │           (WD vs Staging)                                                  │
+            │                                                                            │
+            └───────────────────────── git diff HEAD ────────────────────────────────────┘
+            │                          (WD vs Último Commit)                             │
+            │                                                                            │
+            │                                      └─────── git diff --staged ───────────┘
+            │                                               (Staging vs Último Commit)
+```
+
+1. **`git diff` (a secas):**  
+   Compara tu **Working Directory** con el **Staging Area**.  
+   *Pregunta que responde:* «¿Qué modificaciones he hecho en mi editor que **todavía NO** he preparado con `git add`?»
+2. **`git diff --staged` (o `git diff --cached`):**  
+   Compara el **Staging Area** con el **último commit guardado (HEAD)**.  
+   *Pregunta que responde:* «¿Qué cambios he preparado con `git add` que están listos para sellarse en el próximo commit, comparados con lo que ya estaba en el historial?»  
+3. **`git diff HEAD`:**  
+   Compara tu **Working Directory** directamente con el **último commit**, ignorando si hiciste `git add` o no.  
+   *Pregunta que responde:* «¿Qué diferencias totales hay entre mis archivos actuales y la última foto guardada en el historial?»
+
+---
+
+### ❓ El Gran Dilema Didáctico: ¿Qué ocurre ANTES del Primer Commit?
+
+Esta es una de las dudas más frecuentes y donde más se tropiezan los programadores al empezar:
+
+1. **Repositorio recién nacido (`git init`):**  
+   Cuando acabas de ejecutar `git init`, el repositorio está completamente vacío. La rama por defecto (`main`) se encuentra en un estado que Git llama **"unborn branch" (rama no nacida)**: existe como puntero futuro, pero **aún no apunta a ningún commit** porque el proyecto no tiene ni un solo commit en su historia. La referencia `HEAD` aún no tiene suelo bajo sus pies.
+2. **Archivos nuevos (*Untracked*):**  
+   Si creas un archivo nuevo por primera vez (por ejemplo `app.py`) y ejecutas `git diff`, la terminal no mostrará absolutamente nada. ¿Por qué? Porque `git diff` solo compara archivos que Git ya está rastreando. Para Git, un archivo *untracked* simplemente "no existe todavía en su radar".
+3. **¿Por qué fallaría `git diff --staged` aquí?**  
+   Si haces `git add app.py` y ejecutas `git diff --staged`, Git intentará comparar tu Staging Area contra el "último commit (`HEAD`)". ¡Pero es que **aún no existe ningún último commit**!  
+   En Git obtendrías un error como:  
+   `fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree`  
+   *(o en ciertas versiones, un resultado en blanco)*.  
+   No puedes preguntarle a Git «¿en qué se diferencia esto del commit anterior?» si el universo del proyecto aún no ha tenido su primer commit.
+4. **El "Big Bang": El Primer Commit:**  
+   En cuanto ejecutas tu primer `git commit -m "feat: commit inicial"`, se crea el commit raíz, `HEAD` cobra vida y el historial echa a andar. A partir de ese preciso instante, `git diff --staged`, `git diff HEAD` y `git log` tienen un anclaje contra el que funcionar.
+
+---
+
+### ⚡ Mini-Práctica Flash 3: Dominando `status`, `diff`, tu Primer Commit y `log --graph`
+
+Sigue este paso a paso para vivir en primera persona este flujo natural:
+
+#### Paso 1: El estado "Untracked" (Sin seguimiento)
 ```bash
-# 1. Creamos dos archivos
+# Creamos dos archivos
 echo "print('Hola Mundo')" > app.py
 echo "SECRET_KEY=12345" > config.env
 
-# 2. Preguntamos el estado del proyecto
+# Comprobamos el estado
 git status
 ```
-*Observa:* Ambos archivos aparecen en rojo bajo "Untracked files" (fuera del escenario).
+*Observa:* Ambos archivos aparecen en rojo bajo *"Untracked files"*.  
+Si ejecutas `git diff`, verás que no sale nada porque Git aún no los vigila.
 
+#### Paso 2: Preparando el escenario (Staging Area)
 ```bash
-# 3. Añadimos SOLO el archivo de código, dejando fuera el archivo de claves
+# Subimos SOLO app.py a la caja de preparación
 git add app.py
+
 git status
 ```
-*Observa:* `app.py` está en verde ("Changes to be committed"), mientras que `config.env` sigue en rojo. ¡Tú tienes el control total de lo que entra al commit!
+*Observa:* `app.py` ahora aparece en verde (*"Changes to be committed"*). `config.env` sigue en rojo.  
+*(Recuerda: aquí aún no hacemos `git diff --staged` porque todavía no existe ningún commit previo contra el que comparar).*
+
+#### Paso 3: El Big Bang (Tu Primer Commit)
+```bash
+git commit -m "feat: commit inicial con app.py"
+```
+*¡Hito alcanzado!*: Acaba de nacer el commit génesis de tu repositorio. La referencia `HEAD` ya apunta a este commit inicial.
+
+#### Paso 4: La magia de `git diff` en acción
+Ahora que ya existe historia previa, modifiquemos `app.py`:
 
 ```bash
-# 4. Modificamos app.py para ver qué hace git diff
-echo "print('Hola Mundo Bienvenidos al Bootcamp')" > app.py
+# Modificamos el contenido de app.py
+echo "print('Hola Mundo Bienvenidos al Bootcamp 2026')" > app.py
 
-# Comparamos el área de trabajo con el staging area:
+# A) ¿Qué cambié en mis archivos respecto a lo que había preparado/guardado?
 git diff
-
-# Comparamos lo que ya está en staging con el último commit:
-git diff --staged
-
-# 5. Sellamos el commit
-git add app.py
-git commit -m "feat: añadir saludo inicial en app.py"
-
-# 6. Inspeccionamos el árbol de historia
-git log --oneline
 ```
+*Observa la salida:*
+```diff
+-print('Hola Mundo')
++print('Hola Mundo Bienvenidos al Bootcamp 2026')
+```
+Git te muestra en rojo `-` lo que se borró y en verde `+` lo que se añadió.
+
+```bash
+# B) Subimos la modificación al Staging Area
+git add app.py
+
+# Si ahora preguntas con 'git diff' a secas:
+git diff
+```
+*¡Sorpresa!* No imprime nada. ¿Por qué? Porque el Working Directory y el Staging Area tienen exactamente el mismo contenido.
+
+```bash
+# C) Ahora preguntamos con '--staged' (Staging vs Último Commit existente):
+git diff --staged
+```
+*¡Bingo!* Aquí sí ves los cambios, porque estás comparando lo que tienes en la caja de mudanza contra el commit anterior (`HEAD`).
+
+#### Paso 5: Guardar el segundo commit
+```bash
+git commit -m "feat: actualizar saludo de bienvenida"
+```
+
+#### Paso 6: Inspeccionar la historia con estilo visual (`git log --graph`)
+Un simple `git log` se queda largo y poco intuitivo cuando tu proyecto crece. Usemos el comando maestro para ver la genealogía visual de commits:
+
+```bash
+git log --graph --oneline --decorate --all
+```
+
+* **Salida visual en tu terminal:**
+```text
+* 8f4a1c2 (HEAD -> main) feat: actualizar saludo de bienvenida
+* 1b2e3f4 feat: commit inicial con app.py
+```
+
+* **¿Qué hace cada bandera (flag)?**
+  - `--graph`: Dibuja un árbol en texto ASCII con ramas y asteriscos `* | / \` que ilustra de forma clara cómo bifurcan y se unen las ramas.
+  - `--oneline`: Condensa cada commit a una sola línea (hash abreviado de 7 caracteres + título del commit).
+  - `--decorate`: Muestra las etiquetas a color de las ramas locales (`main`), remotas (`origin/main`) y hacia dónde apunta `HEAD`.
+  - `--all`: Muestra todos los commits de todas las ramas, incluso aquellas en las que no estás situado ahora mismo.
+
+> [!TIP]
+> **El Alias Secreto de los Profesionales:**  
+> Escribir `--graph --oneline --decorate --all` todo el tiempo es agotador. En Git puedes crear tu propio comando abreviado (un alias) ejecutando esto una sola vez:  
+> ```bash
+> git config --global alias.lg "log --graph --oneline --decorate --all"
+> ```  
+> ¡A partir de ahora solo tendrás que escribir **`git lg`** en cualquier terminal para ver tu árbol gráfico precioso y colorido!
 
 ---
 
@@ -387,10 +506,20 @@ echo "Color de fondo: Negro Medianoche con acentos en Azul Marino" > diseno.txt
 git add diseno.txt
 git commit -m "merge: resolver conflicto de diseno combinando negro y azul"
 
-# 9. Comprobamos el árbol resultante
-git log --oneline --graph
+# 9. Comprobamos el árbol visual del merge
+git log --graph --oneline --decorate -n 6
 ```
-*¡Enhorabuena!*: Has resuelto tu primer conflicto con criterio técnico.
+* Observa cómo Git dibuja la bifurcación y la unión de las dos ramas en la terminal:
+```text
+*   d4e5f6a (HEAD -> main) merge: resolver conflicto de diseno combinando negro y azul
+|\  
+| * b2c3d4e (fondo-azul) estilo: color azul marino
+* | a1b2c3d estilo: color negro medianoche
+|/  
+* 8f4a1c2 feat: actualizar saludo de bienvenida
+* 1b2e3f4 feat: commit inicial con app.py
+```
+*¡Enhorabuena!*: Has resuelto tu primer conflicto y puedes ver con tus propios ojos el diamante del merge en tu terminal.
 
 ---
 
