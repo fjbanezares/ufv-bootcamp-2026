@@ -382,53 +382,207 @@ git commit -m "chore: configurar .gitignore para proteger archivos sensibles"
 ![Parte 4: Stage vs Stash: guardar sin perder el hilo](./git%20crash%20course/git4.png)
 
 ### 🎯 La Idea en Humano
-Imagina que estás en mitad de una tarea compleja modificando 4 archivos a la vez. De repente, entra tu jefe o profesor por la puerta:  
-> *"¡Emergencia! Hay un error crítico en producción y tienes que arreglarlo ahora mismo en otra rama."*
+Imagina que estás en mitad de una tarea compleja modificando código a fondo. De repente, entra una urgencia crítica:  
+> *"¡Emergencia! Hay un error grave en producción y tienes que arreglarlo ahora mismo en este archivo o en otra rama."*
 
 - Tu código actual está a medio escribir, no compila y no quieres hacer un commit chapucero como `"wip asdf no compila"`.
-- Tampoco puedes cambiar de rama porque Git te impedirá moverte si hay cambios sucios sin guardar.
+- Tampoco puedes cambiar de rama o aplicar parches limpios porque Git no te dejará sobreescribir archivos que tienen cambios sin guardar.
 
 **La solución es `git stash` (El cajón de sastre):**  
-`git stash` coge todos tus cambios a medio hacer, los mete en un cajón temporal y deja tu directorio de trabajo completamente limpio. Haces el arreglo urgente, y cuando termines, abres el cajón y recuperas exactamente donde te habías quedado.
-
-### 🛠️ Comandos Esenciales de Stash
-- `git stash`: Guarda los cambios sucios en el cajón.
-- `git stash list`: Lista todo lo que tienes guardado en el cajón.
-- `git stash apply`: Aplica los cambios guardados pero los mantiene en el cajón.
-- `git stash pop`: Aplica los cambios y **los elimina del cajón** (la opción más común).
-- `git stash push -m "mensaje"`: Guarda en el cajón con una etiqueta descriptiva (ej. `"trabajo en UI botones"`).
+`git stash` coge todos tus cambios a medio hacer, los mete en un cajón temporal y deja tu directorio de trabajo completamente limpio (idéntico al último commit). Haces el arreglo urgente, y cuando termines, abres el cajón y recuperas exactamente donde te habías quedado.
 
 ---
 
-### ⚡ Mini-Práctica Flash 4: El Simulacro de la Emergencia
+### 🧠 ¿Qué es realmente `git stash` por debajo? (Desmontando el mito)
 
+Muchos tutoriales dicen que `git stash` es un simple "portapapeles" en memoria RAM. **Esto es falso.**  
+Git no tiene magia ni portapapeles invisibles: en Git **todo son commits**.
+
+Cuando ejecutas `git stash`, Git crea en secreto una **mini-estructura de commits flotantes** guardada en `.git/refs/stash`:
+1. Crea un commit con lo que tenías en tu **Staging Area**.
+2. Crea otro commit con lo que tenías en tu **Working Directory** (que tiene como padres a tu `HEAD` actual y al commit del stage).
+3. Si usas `--include-untracked`, crea incluso un tercer commit para los archivos nuevos.
+
+```text
+       (Tu rama main)
+    ... -> [ Commit A ] ➔ [ Commit B (HEAD) ]
+                                 ▲        ▲
+                                 │         \
+                                 │       [ Commit Stash: Stage ]
+                                 │          ▲
+                                 │         /
+                            [ Commit Stash: Working Directory ]
+                            (refs/stash)
+```
+
+¡Es literalmente una **mini-rama efímera** que cuelga de tu commit actual!  
+Por eso, si ejecutas `git log --graph --oneline refs/stash -n 2`, verás los commits reales del stash con sus propios hashes criptográficos.
+
+---
+
+### 💥 El Misterio de `git stash pop`: ¿Por qué se producen conflictos de merge?
+
+Aquí es donde casi todo el mundo se asusta por primera vez:
+1. Tienes cambios a medias en `app.py`.
+2. Haces `git stash` (tu directorio queda limpio).
+3. Llega la urgencia: modificas `app.py` y haces un nuevo commit (`git commit`).
+4. Intentas recuperar tu trabajo con `git stash pop`... **¡y salta un conflicto como si hubieras hecho un merge!**
+
+#### ¿Por qué ocurre esto?
+Porque **`git stash pop` ES formalmente un merge de tres vías (*three-way merge*)**:
+* Git intenta fusionar el commit guardado en el stash con el commit actual (`HEAD`).
+* Si el commit que hiciste durante la urgencia tocó **las mismas líneas** que habías guardado en el cajón, Git no puede adivinar con cuál de las dos versiones te quieres quedar.
+* El archivo se marcará con las etiquetas clásicas de conflicto:
+  ```text
+  <<<<<<< Updated upstream
+  (El cambio que acabas de comitear durante la urgencia)
+  =======
+  (Lo que tenías guardado dentro del stash)
+  >>>>>>> Stashed changes
+  ```
+
+#### ¿Por qué `git status` me da a elegir entre `git restore` y `git add`?
+Cuando `stash pop` choca con un conflicto, el archivo queda en estado **`Unmerged paths (both modified)`**:
+* **`git add app.py` (Opción de resolución):** Abres el archivo, decides qué líneas conservar, borras las marcas `<<<<<<<`, `=======`, `>>>>>>>`, guardas y ejecutas `git add app.py`. Con esto le confirmas a Git: *"Conflicto resuelto con éxito"*.
+* **`git restore app.py` (Opción de emergencia / escape):** Si ves que el conflicto es un laberinto y quieres descartar la recuperación del stash para dejar el archivo exactamente como estaba en el commit de la urgencia, usas `git restore`.
+
+#### ⚠️ La Gran Red de Seguridad de Git:
+En condiciones normales, `git stash pop` hace dos cosas a la vez:
+1. Aplica los cambios (`apply`).
+2. Borra la entrada del cajón (`drop`).
+
+**Pero si ocurre un conflicto, Git NUNCA borra el stash del cajón.**  
+Lo deja intacto en `git stash list` por prudencia. Así, si te equivocas resolviendo el conflicto o tienes que cancelar todo, tus cambios siguen a salvo en el cajón. Una vez resuelto el conflicto a mano, deberás vaciar el cajón ejecutando:
 ```bash
-# 1. Empezamos a modificar app.py pero dejamos el código a medias
-echo "def funcion_incompleta():" >> app.py
-echo "    # falta programar todo" >> app.py
+git stash drop
+```
+
+---
+
+### 🛠️ La Caja de Herramientas de Stash
+
+| Comando | Para qué sirve en cristiano |
+| :--- | :--- |
+| `git stash` | Guarda los cambios rastreados en el cajón y limpia la mesa. |
+| `git stash -u` (o `--include-untracked`) | Guarda **también los archivos nuevos** que aún no tenían `git add`. |
+| `git stash push -m "mensaje"` | Guarda con un nombre claro para que sepas qué era dentro de 3 días. |
+| `git stash list` | Abre el cajón y te enseña todo lo guardado con sus índices (`stash@{0}`, etc.). |
+| `git stash apply` | Recupera los cambios pero **mantiene una copia dentro del cajón**. |
+| `git stash pop` | Recupera los cambios e **intenta borrar la entrada del cajón** (si no hay conflictos). |
+| `git stash drop stash@{0}` | Borra manualmente una entrada específica del cajón. |
+| `git stash clear` | Vacía el cajón por completo (¡cuidado, borra todo lo guardado!). |
+
+---
+
+### ⚡ Mini-Práctica Flash 4: Del Stash Limpio al Choque de Trenes
+
+Vamos a practicar los dos escenarios reales en tu terminal:
+
+#### 🧪 Escenario 1: El Caso Limpio (Sin colisiones)
+```bash
+# 1. Modificamos app.py añadiendo una función a medias
+echo "def calcular_impuestos(precio):" >> app.py
+echo "    pass # en construcción" >> app.py
+
+# 2. Comprobamos que está sucio
 git status
 
-# 2. ¡Llega la urgencia! Guardamos en el cajón con mensaje descriptivo
-git stash push -m "WIP: desarrollo de nueva función"
+# 3. Lo guardamos en el cajón con un mensaje reconocible
+git stash push -m "WIP: logica de impuestos"
 
-# 3. Comprobamos cómo quedó el archivo
+# 4. Comprobamos la mesa limpia
 cat app.py
 git status
 ```
-*¡Magia!*: El archivo volvió al estado del último commit. El código roto ha desaparecido de la vista.
+*Observa:* Las líneas en construcción han desaparecido. El archivo está limpio como en el último commit.
 
 ```bash
-# 4. Miramos dentro del cajón
+# 5. Vemos qué hay en el cajón
 git stash list
 
-# 5. Pasó la emergencia: recuperamos nuestro trabajo intacto
+# 6. Recuperamos el trabajo
 git stash pop
 cat app.py
 ```
-Tus líneas incompletas han vuelto a tu editor exactamente como las dejaste. Limpiamos descartando los cambios con:
+*Observa:* Tus líneas han vuelto intactas. Como no hubo colisiones, `git stash list` ahora está vacío.  
+Descartamos este cambio de prueba con:
 ```bash
 git restore app.py
 ```
+
+---
+
+#### 💥 Escenario 2: El Choque de Trenes (Stash con Conflicto Real)
+Ahora vamos a provocar a propósito la situación que desconcierta a todo el mundo:
+
+```bash
+# 1. Tienes app.py con el saludo inicial. Modificas la línea 1:
+echo "print('Hola, estoy probando una idea loca')" > app.py
+
+# 2. Te avisan de una urgencia, así que lo guardas en el stash:
+git stash push -m "WIP: saludo loco"
+
+# 3. En la rama principal modificas LA MISMA LÍNEA para un arreglo urgente y comiteas:
+echo "print('Hola, este es un Hotfix urgente')" > app.py
+git add app.py
+git commit -m "fix: saludo formal de urgencia"
+
+# 4. Llega el momento de la verdad: intentas sacar del cajón tu idea loca
+git stash pop
+```
+
+* **¡BOMBA! La terminal te avisa del conflicto:**
+```text
+Auto-merging app.py
+CONFLICT (content): Merge conflict in app.py
+The stash entry is kept in case you need it.
+```
+
+```bash
+# 5. Comprobamos qué dice git status
+git status
+```
+* Observa el mensaje:
+  ```text
+  Unmerged paths:
+    (use "git restore --staged <file>..." to unstage)
+    (use "git add <file>..." to mark resolution)
+      both modified:   app.py
+  ```
+
+```bash
+# 6. Inspeccionamos el contenido de app.py
+cat app.py
+```
+* Verás las marcas del merge:
+```python
+<<<<<<< Updated upstream
+print('Hola, este es un Hotfix urgente')
+=======
+print('Hola, estoy probando una idea loca')
+>>>>>>> Stashed changes
+```
+
+```bash
+# 7. Resolución: Editamos app.py y dejamos la solución combinada que queramos:
+echo "print('Hola, Hotfix formal combinado con idea genial')" > app.py
+
+# 8. Le decimos a Git que el conflicto está resuelto con git add:
+git add app.py
+
+# 9. Comprobamos que el cajón todavía conserva el stash por seguridad:
+git stash list
+```
+*Verás que `stash@{0}` sigue ahí.* Como hubo conflicto, Git no lo borró automáticamente.
+
+```bash
+# 10. Ahora que ya resolvimos y agregamos el cambio, liberamos el cajón manualmente:
+git stash drop
+
+# Sellamos el commit de la integración:
+git commit -m "feat: integrar trabajo de stash tras resolver conflicto"
+```
+*¡Felicidades!*: Has dominado la situación más temida de `git stash`. Ahora sabes exactamente por qué ocurre, cómo se resuelve y por qué Git te protege en cada paso.
 
 ---
 
