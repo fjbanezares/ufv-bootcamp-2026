@@ -22,11 +22,12 @@ Superación del síndrome del impostor, uso pedagógico de herramientas de IA y 
 - Serie visual de 9 infografías anti-impostor.
 - Buenas prácticas de Inteligencia Artificial para el estudio.
 
-### 💻 [1. Visual Studio Code](./visual_studio_code/)
-Dominio del editor de desarrollo líder de la industria y entorno de programación del bootcamp.
+### 💻 [1. Visual Studio Code & Antigravity](./visual_studio_code/)
+Dominio del editor de desarrollo líder de la industria y programación asistida por agentes autónomos de IA.
 - **[Curso Profundo: Visual Studio Code (Manual Interactivo)](./visual_studio_code/CURSO_VISUAL_STUDIO_CODE.md)**.
-- **Infografía Visual Oficial**: Anatomía, atajos clave, extensiones recomendadas y depuración.
-- **Laboratorios Prácticos**: Práctica y juego interactivo con Git visual, diff por rangos, resolución de conflictos y debugging con breakpoints.
+- **[Curso Profundo: Google Antigravity en VS Code](./visual_studio_code/Antigravity/CURSO_ANTIGRAVITY.md)**: Arquitectura de agentes, atajos ninja (`Ctrl+J`, `Ctrl+Alt+B`), ventajas/inconvenientes y laboratorios.
+- **Infografías Oficiales**: Colección de 7 láminas visuales de VS Code y Antigravity.
+- **Laboratorios Prácticos**: Práctica y juego interactivo con Git visual, diffs por rangos, resolución de conflictos, depuración con breakpoints y comandos inline `Ctrl+I`.
 
 ### 🐧 [2. Linux](./linux/)
 Comandos esenciales de la terminal, gestión de procesos, permisos y scripts de automatización en Bash.

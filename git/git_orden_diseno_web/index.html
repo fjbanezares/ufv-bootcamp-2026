@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git: orden por diseño y colaboración distribuida.</title>
+  <meta name="description" content="Guía visual, extensa y didáctica de Git: working directory, staging, commits, ramas, merges, rebase, stash, remotos, recuperación y colaboración distribuida.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <nav class="topbar">
+      <a class="brand" href="#inicio">GIT//MAP</a>
+      <div class="top-actions">
+        <button id="themeToggle" class="ghost-btn" aria-label="Cambiar tema">◐ Tema</button>
+        <a class="ghost-btn" href="#chuleta">⌘ Chuleta</a>
+      </div>
+    </nav>
+
+    <section id="inicio" class="hero-content">
+      <p class="eyebrow">SISTEMA DISTRIBUIDO DE VERSIONADO · MODELO MENTAL · COLABORACIÓN</p>
+      <h1>Git: orden por diseño y colaboración distribuida.</h1>
+      <p class="hero-subtitle">
+        Git no “guarda archivos”: conserva <strong>instantáneas enlazadas</strong> de un proyecto,
+        mueve referencias y permite que muchas historias locales se coordinen sin perder trazabilidad.
+      </p>
+      <div class="hero-badges">
+        <span>Working Directory</span><span>Staging / Index</span><span>Repository</span>
+        <span>Branches</span><span>Merge</span><span>Rebase</span><span>Remotes</span>
+      </div>
+    </section>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Índice de contenidos">
+      <div class="sidebar-inner">
+        <label class="search-label" for="sectionSearch">Buscar concepto</label>
+        <input id="sectionSearch" type="search" placeholder="Ej. rebase, stash, HEAD…">
+        <nav id="toc">
+          <a href="#modelo">01 · Modelo mental</a>
+          <a href="#objetos">02 · Qué guarda Git</a>
+          <a href="#flujo">03 · add / commit</a>
+          <a href="#ramas">04 · Ramas y HEAD</a>
+          <a href="#merge">05 · Merge</a>
+          <a href="#rebase">06 · Rebase</a>
+          <a href="#conflictos">07 · Conflictos</a>
+          <a href="#deshacer">08 · Deshacer sin drama</a>
+          <a href="#stash">09 · Stash</a>
+          <a href="#remotos">10 · Repos remotos</a>
+          <a href="#colaboracion">11 · Colaboración</a>
+          <a href="#historia">12 · Leer historia</a>
+          <a href="#herramientas">13 · Herramientas avanzadas</a>
+          <a href="#practicas">14 · Buenas prácticas</a>
+          <a href="#laboratorio">15 · Laboratorio interactivo</a>
+          <a href="#chuleta">16 · Chuleta rápida</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main>
+      <section class="section intro-block searchable" data-keywords="git filosofia distribuido instantaneas">
+        <div class="section-kicker">ANTES DE LOS COMANDOS</div>
+        <h2>Git tiene sentido cuando entiendes su diseño</h2>
+        <div class="lead-grid">
+          <article class="idea-card">
+            <h3>1. Git es local primero</h3>
+            <p>Tu repositorio local contiene la historia y puede crear commits, ramas, merges y diffs sin hablar con GitHub, GitLab o ningún servidor.</p>
+          </article>
+          <article class="idea-card">
+            <h3>2. Un commit es una instantánea</h3>
+            <p>No es “una lista de líneas cambiadas”. Conceptualmente es una foto del árbol completo del proyecto, enlazada a su padre.</p>
+          </article>
+          <article class="idea-card">
+            <h3>3. Una rama es barata</h3>
+            <p>Una branch es básicamente una referencia móvil a un commit. Crear una rama no duplica el proyecto.</p>
+          </article>
+          <article class="idea-card">
+            <h3>4. Git mueve referencias</h3>
+            <p>Buena parte de Git consiste en crear objetos inmutables y después mover nombres: <code>main</code>, <code>feature-x</code>, <code>HEAD</code>, tags y remotos.</p>
+          </article>
+        </div>
+        <blockquote>
+          <strong>Idea central:</strong> Git funciona muy bien porque separa tres preguntas:
+          “¿qué tengo ahora?”, “¿qué quiero incluir en la próxima foto?” y “¿qué fotos ya forman parte de la historia?”.
+        </blockquote>
+      </section>
+
+      <section id="modelo" class="section searchable" data-keywords="working directory staging area index repository wd staged">
+        <div class="section-kicker">01 · MODELO MENTAL</div>
+        <h2>Las tres zonas: WD → Staging → Repository</h2>
+        <p class="section-intro">
+          El error más frecuente al aprender Git es imaginar que solo existen “mis archivos” y “GitHub”.
+          Entre medias hay un área decisiva: el <strong>staging area</strong>, también llamada <strong>index</strong>.
+        </p>
+
+        <div class="three-zones">
+          <div class="zone wd">
+            <div class="zone-number">A</div>
+            <h3>Working Directory</h3>
+            <p>Los archivos que ves y editas.</p>
+            <ul>
+              <li>Pueden estar modificados.</li>
+              <li>Pueden ser nuevos y aún no rastreados.</li>
+              <li>Un cambio aquí todavía no forma parte del próximo commit.</li>
+            </ul>
+            <code>git status</code>
+          </div>
+          <div class="arrow">→ <span>git add</span> →</div>
+          <div class="zone stage">
+            <div class="zone-number">B</div>
+            <h3>Staging Area / Index</h3>
+            <p>La selección exacta de la próxima instantánea.</p>
+            <ul>
+              <li>Permite preparar solo parte del trabajo.</li>
+              <li>Hace posible construir commits conceptualmente limpios.</li>
+              <li>No es una carpeta visible: es una estructura interna de Git.</li>
+            </ul>
+            <code>git diff --staged</code>
+          </div>
+          <div class="arrow">→ <span>git commit</span> →</div>
+          <div class="zone repo">
+            <div class="zone-number">C</div>
+            <h3>Repository</h3>
+            <p>La base de datos local de objetos e historia.</p>
+            <ul>
+              <li>Commits ya registrados.</li>
+              <li>Ramas, tags y referencias.</li>
+              <li>Contenido bajo <code>.git/</code>.</li>
+            </ul>
+            <code>git log</code>
+          </div>
+        </div>
+
+        <div class="callout">
+          <h3>¿Por qué existe staging?</h3>
+          <p>
+            Porque “lo que he cambiado” y “lo que quiero convertir en un commit” no tienen por qué ser lo mismo.
+            Has podido modificar cuatro archivos para investigar un bug, pero quizá el commit correcto solo deba incluir dos.
+          </p>
+        </div>
+
+        <div class="two-col">
+          <article>
+            <h3>Dos diffs distintos</h3>
+            <pre><code>git diff
+# Working Directory ↔ Staging
+
+git diff --staged
+# Staging ↔ último commit</code></pre>
+          </article>
+          <article>
+            <h3>Y una tercera comparación útil</h3>
+            <pre><code>git diff HEAD
+# Working Directory + Staging
+# contra el commit actual</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section id="objetos" class="section searchable" data-keywords="blob tree commit tag object hash sha content addressable">
+        <div class="section-kicker">02 · QUÉ GUARDA GIT</div>
+        <h2>Git es una base de datos de objetos direccionados por contenido</h2>
+        <p class="section-intro">
+          La carpeta <code>.git</code> contiene la maquinaria. Git identifica objetos mediante hashes.
+          Eso permite detectar contenido idéntico, referenciarlo y construir historia verificable.
+        </p>
+
+        <div class="object-grid">
+          <article class="object-card">
+            <span class="object-type">blob</span>
+            <h3>Contenido de archivo</h3>
+            <p>Un blob representa bytes de un archivo. No “sabe” su nombre: el nombre vive en el tree.</p>
+          </article>
+          <article class="object-card">
+            <span class="object-type">tree</span>
+            <h3>Directorio</h3>
+            <p>Relaciona nombres con blobs y subtrees. Es la estructura jerárquica de la instantánea.</p>
+          </article>
+          <article class="object-card">
+            <span class="object-type">commit</span>
+            <h3>Instantánea + contexto</h3>
+            <p>Apunta a un tree, a uno o más padres, autor, fecha y mensaje.</p>
+          </article>
+          <article class="object-card">
+            <span class="object-type">tag</span>
+            <h3>Nombre estable</h3>
+            <p>Puede apuntar a un commit para marcar una versión como <code>v2.4.0</code>.</p>
+          </article>
+        </div>
+
+        <div class="diagram">
+          <div class="node commit-node">commit C3<br><small>tree T3 · parent C2</small></div>
+          <div class="down">↓</div>
+          <div class="node tree-node">tree T3<br><small>src/ · README.md</small></div>
+          <div class="split">↙︎ &nbsp;&nbsp;&nbsp;&nbsp; ↘︎</div>
+          <div class="node-row">
+            <div class="node blob-node">blob<br><small>README</small></div>
+            <div class="node tree-node">tree<br><small>src/</small></div>
+          </div>
+        </div>
+
+        <details>
+          <summary>Una consecuencia profunda: los commits son esencialmente inmutables</summary>
+          <p>
+            Si cambias su contenido, su metadata o su padre, cambia su identidad. Por eso operaciones como
+            <code>rebase</code> o <code>commit --amend</code> no “editan” commits antiguos en el sentido tradicional:
+            generan commits nuevos.
+          </p>
+        </details>
+      </section>
+
+      <section id="flujo" class="section searchable" data-keywords="init status add commit staged restore gitignore tracked untracked">
+        <div class="section-kicker">03 · FLUJO BÁSICO</div>
+        <h2>De carpeta normal a historia versionada</h2>
+
+        <div class="timeline">
+          <div class="step">
+            <span>01</span>
+            <h3>Inicializar</h3>
+            <pre><code>git init</code></pre>
+            <p>Crea <code>.git/</code>. La carpeta pasa a ser un repositorio.</p>
+          </div>
+          <div class="step">
+            <span>02</span>
+            <h3>Inspeccionar</h3>
+            <pre><code>git status</code></pre>
+            <p>Pregunta imprescindible: qué está modificado, staged o sin rastrear.</p>
+          </div>
+          <div class="step">
+            <span>03</span>
+            <h3>Seleccionar</h3>
+            <pre><code>git add app.js
+git add .
+git add -p</code></pre>
+            <p><code>-p</code> permite elegir fragmentos concretos.</p>
+          </div>
+          <div class="step">
+            <span>04</span>
+            <h3>Fotografiar</h3>
+            <pre><code>git commit -m "Añade validación"</code></pre>
+            <p>Crea un nuevo commit desde el index.</p>
+          </div>
+        </div>
+
+        <h3>Estados típicos de un archivo</h3>
+        <div class="state-flow">
+          <span>untracked</span><b>→ git add →</b><span>staged</span><b>→ commit →</b><span>tracked / clean</span><b>→ editar →</b><span>modified</span>
+        </div>
+
+        <div class="compare-table-wrap">
+          <table>
+            <thead><tr><th>Comando</th><th>Qué hace realmente</th><th>Error mental típico</th></tr></thead>
+            <tbody>
+              <tr><td><code>git add archivo</code></td><td>Copia la versión actual del archivo al index.</td><td>Creer que “avisa a Git” una sola vez.</td></tr>
+              <tr><td><code>git add .</code></td><td>Actualiza el staging con muchos cambios del árbol actual.</td><td>Usarlo sin mirar qué va a entrar.</td></tr>
+              <tr><td><code>git add -p</code></td><td>Permite stagear por hunks.</td><td>No usarlo y mezclar ideas distintas.</td></tr>
+              <tr><td><code>git commit</code></td><td>Crea un commit a partir del index.</td><td>Pensar que captura automáticamente todo el WD.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tip">
+          <strong>Regla de oro:</strong> antes de confirmar, usa <code>git diff --staged</code>.
+          Así revisas exactamente la foto que vas a convertir en historia.
+        </div>
+
+        <h3>.gitignore no es una papelera</h3>
+        <pre><code># Ejemplo
+node_modules/
+.env
+dist/
+*.log
+.DS_Store</code></pre>
+        <p>
+          <code>.gitignore</code> evita que archivos <strong>no rastreados</strong> entren accidentalmente.
+          Si un archivo ya está versionado, añadirlo al ignore no lo elimina de la historia ni deja de seguirlo automáticamente.
+        </p>
+      </section>
+
+      <section id="ramas" class="section searchable" data-keywords="branch switch checkout head detached main pointer refs">
+        <div class="section-kicker">04 · RAMAS Y HEAD</div>
+        <h2>Una rama es un nombre que apunta a un commit</h2>
+        <p class="section-intro">
+          Esta idea elimina mucha magia. La rama no es una “carpeta paralela”: es una referencia móvil.
+          Cuando confirmas cambios, la rama activa avanza al nuevo commit.
+        </p>
+
+        <div class="branch-graph" aria-label="Esquema de ramas">
+          <div class="branch-line">
+            <span class="commit-dot">A</span>──<span class="commit-dot">B</span>──<span class="commit-dot">C</span>──<span class="commit-dot current">D</span>
+            <span class="branch-label">main</span>
+          </div>
+          <div class="branch-line feature">
+            <span class="indent"></span>└────<span class="commit-dot">E</span>──<span class="commit-dot">F</span>
+            <span class="branch-label alt">feature/login</span>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <article>
+            <h3>Crear y cambiar</h3>
+            <pre><code>git branch feature/login
+git switch feature/login
+
+# En una línea:
+git switch -c feature/login</code></pre>
+          </article>
+          <article>
+            <h3>Ver ramas</h3>
+            <pre><code>git branch
+git branch -vv
+git branch --all</code></pre>
+          </article>
+        </div>
+
+        <div class="callout">
+          <h3>HEAD: “dónde estoy”</h3>
+          <p>
+            Normalmente <code>HEAD</code> apunta a la rama activa, y esa rama apunta al commit actual.
+            Por tanto: <code>HEAD → main → commit D</code>.
+          </p>
+        </div>
+
+        <details>
+          <summary>¿Qué es “detached HEAD”?</summary>
+          <p>
+            Significa que <code>HEAD</code> apunta directamente a un commit, no a una rama.
+            Puedes explorar y hasta crear commits, pero conviene crear una rama si quieres conservar cómodamente ese trabajo:
+          </p>
+          <pre><code>git switch -c rescate-experimento</code></pre>
+        </details>
+      </section>
+
+      <section id="merge" class="section searchable" data-keywords="merge fast forward three way merge commit no ff">
+        <div class="section-kicker">05 · MERGE</div>
+        <h2>Merge: conservar dos líneas de historia y unirlas</h2>
+        <p class="section-intro">
+          Un merge pregunta: “¿cómo hago que esta rama incluya también el trabajo de aquella?”.
+          Dependiendo de la topología, puede bastar con mover un puntero o requerir un commit de fusión.
+        </p>
+
+        <div class="concept-pair">
+          <article>
+            <h3>Fast-forward</h3>
+            <div class="mini-graph"><code>A — B — C — D</code></div>
+            <p>Si <code>main</code> no ha divergido, Git puede simplemente adelantar <code>main</code> hasta D.</p>
+            <pre><code>git switch main
+git merge feature</code></pre>
+          </article>
+          <article>
+            <h3>Three-way merge</h3>
+            <div class="mini-graph"><code>A — B — C
+     \   \
+      D — M</code></div>
+            <p>Si ambas ramas avanzaron, Git busca ancestro común y crea normalmente un commit de merge <code>M</code>.</p>
+            <pre><code>git switch main
+git merge feature</code></pre>
+          </article>
+        </div>
+
+        <h3>Merge no significa “copiar archivos”</h3>
+        <p>
+          Git compara historias y combina cambios relativos al ancestro común. Esta diferencia explica por qué
+          puede fusionar automáticamente trabajo realizado en zonas distintas del mismo proyecto.
+        </p>
+
+        <div class="warning">
+          <strong><code>--no-ff</code></strong> fuerza un commit de merge incluso cuando el fast-forward sería posible.
+          Puede ser útil si quieres que la existencia de una feature quede explícita en el grafo.
+        </div>
+      </section>
+
+      <section id="rebase" class="section searchable" data-keywords="rebase rewrite history linear commits interactive autosquash squash">
+        <div class="section-kicker">06 · REBASE</div>
+        <h2>Rebase: reescribir la base de una serie de commits</h2>
+        <p class="section-intro">
+          Mientras merge une historias, rebase toma commits y los <strong>recrea</strong> encima de otra base.
+          El resultado suele ser más lineal, pero los hashes cambian.
+        </p>
+
+        <div class="before-after">
+          <article>
+            <h3>Antes</h3>
+            <pre class="graph-code"><code>A — B — C   main
+     \
+      D — E feature</code></pre>
+          </article>
+          <article>
+            <h3>Después de <code>git rebase main</code></h3>
+            <pre class="graph-code"><code>A — B — C   main
+         \
+          D' — E' feature</code></pre>
+          </article>
+        </div>
+
+        <pre><code>git switch feature
+git rebase main</code></pre>
+
+        <div class="warning">
+          <strong>Importante:</strong> rebase cambia historia. Es excelente con commits locales que controlas.
+          Evita rebasar historia pública compartida si otros ya construyeron trabajo sobre esos commits.
+        </div>
+
+        <h3>Rebase interactivo: editar tu propia narrativa</h3>
+        <pre><code>git rebase -i HEAD~5</code></pre>
+        <div class="pill-grid">
+          <span><b>pick</b> conservar</span>
+          <span><b>reword</b> cambiar mensaje</span>
+          <span><b>edit</b> detenerse y modificar</span>
+          <span><b>squash</b> combinar conservando mensajes</span>
+          <span><b>fixup</b> combinar descartando mensaje menor</span>
+          <span><b>drop</b> eliminar commit</span>
+        </div>
+
+        <h3>Merge vs Rebase</h3>
+        <div class="compare-table-wrap">
+          <table>
+            <thead><tr><th></th><th>Merge</th><th>Rebase</th></tr></thead>
+            <tbody>
+              <tr><td>Historia</td><td>Preserva divergencia real.</td><td>La linealiza.</td></tr>
+              <tr><td>Hashes existentes</td><td>Normalmente no cambian.</td><td>Los commits rebasados se recrean.</td></tr>
+              <tr><td>Uso típico</td><td>Integración de ramas.</td><td>Actualizar una feature antes de integrarla.</td></tr>
+              <tr><td>Riesgo</td><td>Grafo más ruidoso.</td><td>Reescribir historia compartida.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="conflictos" class="section searchable" data-keywords="conflict merge conflict ours theirs resolve markers">
+        <div class="section-kicker">07 · CONFLICTOS</div>
+        <h2>Un conflicto no es un fallo: es una decisión que Git no puede tomar por ti</h2>
+        <p>
+          Si dos historias modifican de manera incompatible la misma zona, Git necesita contexto humano.
+          Señala el punto y detiene la operación.
+        </p>
+
+        <pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+precio = calcularPrecioVIP();
+=======
+precio = calcularPrecioPromocional();
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature-promos</code></pre>
+
+        <div class="timeline compact">
+          <div class="step"><span>1</span><h3>Leer</h3><p>Identifica la intención de ambos cambios.</p></div>
+          <div class="step"><span>2</span><h3>Resolver</h3><p>Edita el archivo y elimina los marcadores.</p></div>
+          <div class="step"><span>3</span><h3>Stagear</h3><pre><code>git add archivo</code></pre></div>
+          <div class="step"><span>4</span><h3>Continuar</h3><pre><code>git merge --continue
+# o
+git rebase --continue</code></pre></div>
+        </div>
+
+        <div class="tip">
+          Si quieres abandonar la operación:
+          <code>git merge --abort</code> o <code>git rebase --abort</code>.
+        </div>
+      </section>
+
+      <section id="deshacer" class="section searchable" data-keywords="restore reset revert amend reflog undo unstage soft mixed hard">
+        <div class="section-kicker">08 · DESHACER SIN DRAMA</div>
+        <h2>“Deshacer” puede significar cuatro cosas distintas</h2>
+        <p class="section-intro">
+          Antes de usar un comando destructivo, pregunta qué quieres cambiar:
+          ¿el Working Directory, el staging, el puntero de la rama o una historia ya publicada?
+        </p>
+
+        <div class="compare-table-wrap">
+          <table>
+            <thead><tr><th>Quiero…</th><th>Comando</th><th>Idea</th></tr></thead>
+            <tbody>
+              <tr><td>Descartar cambios locales de un archivo</td><td><code>git restore archivo</code></td><td>Restaura desde el index.</td></tr>
+              <tr><td>Sacar algo del staging</td><td><code>git restore --staged archivo</code></td><td>Unstage; conserva cambios en WD.</td></tr>
+              <tr><td>Corregir el último commit</td><td><code>git commit --amend</code></td><td>Recrea el último commit.</td></tr>
+              <tr><td>Deshacer un commit publicado</td><td><code>git revert HASH</code></td><td>Crea un commit inverso; no borra historia.</td></tr>
+              <tr><td>Mover la rama hacia atrás conservando staging</td><td><code>git reset --soft HEAD~1</code></td><td>Mueve referencia; index intacto.</td></tr>
+              <tr><td>Mover rama y desstagear cambios</td><td><code>git reset HEAD~1</code></td><td>Modo mixed por defecto.</td></tr>
+              <tr><td>Volver atrás destruyendo cambios locales</td><td><code>git reset --hard HEAD~1</code></td><td>Peligroso: altera WD e index.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>El salvavidas: reflog</h3>
+        <pre><code>git reflog</code></pre>
+        <p>
+          <code>reflog</code> registra por dónde han pasado referencias locales como HEAD.
+          Si moviste una rama por error, muchas veces el commit “perdido” sigue existiendo y puedes recuperarlo.
+        </p>
+
+        <pre><code>git reflog
+# ... aparece abc1234 HEAD@{3}
+
+git switch -c rescate abc1234</code></pre>
+
+        <div class="danger">
+          <strong>Piensa dos veces antes de <code>reset --hard</code>.</strong>
+          Git suele poder recuperar commits; los cambios locales nunca registrados pueden ser mucho más difíciles de rescatar.
+        </div>
+      </section>
+
+      <section id="stash" class="section searchable" data-keywords="stash temporary save pop apply list drop">
+        <div class="section-kicker">09 · STASH</div>
+        <h2>Stash: aparcar cambios sin convertirlos todavía en commit</h2>
+        <p>
+          Útil cuando necesitas cambiar de contexto rápidamente pero tu trabajo actual aún no merece un commit.
+          El stash es una pila de estados temporales.
+        </p>
+
+        <div class="two-col">
+          <article>
+            <pre><code>git stash
+git stash push -m "WIP validación"
+git stash list</code></pre>
+          </article>
+          <article>
+            <pre><code>git stash apply stash@{0}
+git stash pop
+git stash drop stash@{0}</code></pre>
+          </article>
+        </div>
+
+        <div class="tip">
+          <code>apply</code> reaplica y conserva el stash. <code>pop</code> reaplica y, si todo va bien, lo elimina.
+        </div>
+        <p>
+          No conviertas el stash en un “trastero de meses”. Para trabajo importante y duradero, una rama y commits provisionales suelen ser más visibles y seguros.
+        </p>
+      </section>
+
+      <section id="remotos" class="section searchable" data-keywords="remote origin clone fetch pull push tracking upstream github gitlab origin upstream">
+        <div class="section-kicker">10 · REPOSITORIOS REMOTOS</div>
+        <h2>Git distribuido: remoto no significa “repositorio principal” por necesidad técnica</h2>
+        <p class="section-intro">
+          Un remoto es otro repositorio identificado por un nombre y una URL.
+          Por convención, el primero suele llamarse <code>origin</code>.
+        </p>
+
+        <div class="remote-diagram">
+          <div class="machine">
+            <h3>Tu portátil</h3>
+            <div class="repo-box">
+              <span>main</span>
+              <span>feature</span>
+              <span class="remote-ref">origin/main</span>
+            </div>
+          </div>
+          <div class="network-arrows">
+            <span>push →</span>
+            <span>← fetch</span>
+          </div>
+          <div class="machine server">
+            <h3>Servidor remoto</h3>
+            <div class="repo-box">
+              <span>main</span>
+              <span>feature</span>
+            </div>
+          </div>
+        </div>
+
+        <h3><code>clone</code></h3>
+        <pre><code>git clone https://servidor/proyecto.git</code></pre>
+        <p>Crea una copia local, configura <code>origin</code> y obtiene referencias remotas.</p>
+
+        <h3><code>fetch</code>: mirar sin integrar</h3>
+        <pre><code>git fetch origin</code></pre>
+        <p>
+          Descarga objetos y actualiza referencias como <code>origin/main</code>.
+          No modifica automáticamente tu rama local <code>main</code>.
+        </p>
+
+        <h3><code>pull</code>: descargar + integrar</h3>
+        <pre><code>git pull
+# aproximadamente:
+git fetch
+git merge   # según configuración</code></pre>
+        <p>
+          También puede configurarse para rebase:
+        </p>
+        <pre><code>git pull --rebase</code></pre>
+
+        <h3><code>push</code>: publicar referencias y objetos</h3>
+        <pre><code>git push origin main
+
+# Primera vez de una rama:
+git push -u origin feature/login</code></pre>
+        <p><code>-u</code> establece la rama remota de seguimiento (upstream).</p>
+
+        <div class="concept-pair">
+          <article>
+            <h3><code>main</code></h3>
+            <p>Tu rama local. Tú la puedes mover creando commits, merges, resets, etc.</p>
+          </article>
+          <article>
+            <h3><code>origin/main</code></h3>
+            <p>Tu última representación local conocida del estado de <code>main</code> en <code>origin</code>, normalmente actualizada por fetch.</p>
+          </article>
+        </div>
+
+        <details>
+          <summary>¿Por qué un push puede ser rechazado?</summary>
+          <p>
+            Porque el remoto contiene commits que tu rama local no incluye. Git evita sobreescribirlos por accidente.
+            Primero debes integrar esa historia o decidir explícitamente una estrategia de reescritura.
+          </p>
+        </details>
+
+        <div class="warning">
+          Si realmente necesitas reescribir una rama remota, <code>git push --force-with-lease</code>
+          suele ser más prudente que <code>--force</code>, porque comprueba que el remoto no haya avanzado inesperadamente.
+        </div>
+      </section>
+
+      <section id="colaboracion" class="section searchable" data-keywords="workflow collaboration feature branch pull request trunk based gitflow fork code review">
+        <div class="section-kicker">11 · COLABORACIÓN</div>
+        <h2>Git separa integración técnica de política de equipo</h2>
+        <p>
+          Git sabe mover y combinar historia. El equipo decide <em>cómo</em> quiere organizar ese trabajo:
+          ramas cortas, pull requests, revisiones, integración continua, tags, releases, etc.
+        </p>
+
+        <div class="lead-grid">
+          <article class="idea-card">
+            <h3>Feature Branch</h3>
+            <p>Una rama por cambio. Muy común con Pull/Merge Requests y revisión de código.</p>
+          </article>
+          <article class="idea-card">
+            <h3>Trunk-Based</h3>
+            <p>Ramas muy cortas o commits frecuentes sobre una rama principal protegida. Favorece integración continua.</p>
+          </article>
+          <article class="idea-card">
+            <h3>GitFlow</h3>
+            <p>Modelo con <code>develop</code>, features, releases y hotfixes. Más ceremonioso; útil en ciertos ciclos de release.</p>
+          </article>
+          <article class="idea-card">
+            <h3>Fork Workflow</h3>
+            <p>Cada contribuidor trabaja desde su fork y propone cambios al repositorio original.</p>
+          </article>
+        </div>
+
+        <h3>Un flujo sano de feature</h3>
+        <pre><code>git switch main
+git pull --ff-only
+
+git switch -c feature/buscador
+
+# trabajar
+git add -p
+git commit -m "Añade búsqueda por título"
+
+git fetch origin
+git rebase origin/main
+
+git push -u origin feature/buscador
+# abrir Pull Request / Merge Request</code></pre>
+
+        <h3>Commits pequeños pero con significado</h3>
+        <ul class="dense-list">
+          <li>Un commit debe representar una idea coherente.</li>
+          <li>Debe poder explicarse con una frase.</li>
+          <li>Idealmente compila y deja tests razonablemente sanos.</li>
+          <li>Separar refactor y cambio funcional facilita revisión y reversión.</li>
+          <li>“WIP, arreglos, cosas” dicen poco; el mensaje debe explicar intención.</li>
+        </ul>
+
+        <div class="callout">
+          <h3>Los Pull Requests no son parte del núcleo de Git</h3>
+          <p>
+            Son una capa de colaboración ofrecida por plataformas como GitHub, GitLab o Bitbucket.
+            Git por sí mismo no necesita PRs para fusionar ramas.
+          </p>
+        </div>
+      </section>
+
+      <section id="historia" class="section searchable" data-keywords="log show diff blame graph history inspect">
+        <div class="section-kicker">12 · LEER LA HISTORIA</div>
+        <h2>Saber consultar Git vale tanto como saber escribir en él</h2>
+
+        <div class="command-grid">
+          <article><code>git log</code><p>Historia de commits.</p></article>
+          <article><code>git log --oneline</code><p>Vista compacta.</p></article>
+          <article><code>git log --graph --all</code><p>Topología de ramas.</p></article>
+          <article><code>git show HASH</code><p>Commit + cambios.</p></article>
+          <article><code>git diff A..B</code><p>Diferencias entre dos puntos.</p></article>
+          <article><code>git blame archivo</code><p>Commit asociado a cada línea actual.</p></article>
+        </div>
+
+        <pre><code>git log --graph --decorate --oneline --all</code></pre>
+
+        <div class="tip">
+          Crea un alias para no escribirlo siempre:
+          <code>git config --global alias.lg "log --graph --decorate --oneline --all"</code>
+        </div>
+      </section>
+
+      <section id="herramientas" class="section searchable" data-keywords="cherry pick bisect tag worktree submodule sparse hooks sign gc advanced">
+        <div class="section-kicker">13 · HERRAMIENTAS AVANZADAS</div>
+        <h2>Git tiene herramientas quirúrgicas para problemas concretos</h2>
+
+        <div class="advanced-grid">
+          <article>
+            <h3>cherry-pick</h3>
+            <pre><code>git cherry-pick abc1234</code></pre>
+            <p>Aplica el cambio introducido por un commit concreto sobre la rama actual, creando un commit nuevo.</p>
+          </article>
+          <article>
+            <h3>bisect</h3>
+            <pre><code>git bisect start
+git bisect bad
+git bisect good v2.0</code></pre>
+            <p>Búsqueda binaria para encontrar qué commit introdujo un fallo.</p>
+          </article>
+          <article>
+            <h3>tags</h3>
+            <pre><code>git tag -a v3.0.0 -m "Release 3.0"</code></pre>
+            <p>Marcan puntos estables de historia. Muy usados para releases.</p>
+          </article>
+          <article>
+            <h3>worktree</h3>
+            <pre><code>git worktree add ../hotfix hotfix</code></pre>
+            <p>Permite tener varias ramas del mismo repo abiertas en directorios distintos.</p>
+          </article>
+          <article>
+            <h3>sparse-checkout</h3>
+            <pre><code>git sparse-checkout init --cone</code></pre>
+            <p>Útil en repos grandes cuando solo quieres materializar parte del árbol de trabajo.</p>
+          </article>
+          <article>
+            <h3>hooks</h3>
+            <pre><code>.git/hooks/pre-commit</code></pre>
+            <p>Scripts disparados por eventos. Pueden validar formato, tests o políticas antes de ciertas operaciones.</p>
+          </article>
+        </div>
+
+        <details>
+          <summary>Submodules: repositorios dentro de repositorios</summary>
+          <p>
+            Un submodule registra una referencia a un commit de otro repositorio.
+            Es potente pero introduce complejidad de sincronización. No es simplemente “una carpeta Git normal”.
+          </p>
+        </details>
+
+        <details>
+          <summary>Firma de commits y tags</summary>
+          <p>
+            Git permite asociar firmas criptográficas a commits y tags para mejorar garantías de autoría e integridad en flujos que lo requieren.
+          </p>
+        </details>
+      </section>
+
+      <section id="practicas" class="section searchable" data-keywords="best practices mistakes clean commits messages secrets large files">
+        <div class="section-kicker">14 · BUENAS PRÁCTICAS</div>
+        <h2>La calidad de un repositorio se nota en su historia</h2>
+
+        <div class="do-dont">
+          <article class="do">
+            <h3>Haz</h3>
+            <ul>
+              <li><code>git status</code> con frecuencia.</li>
+              <li>Revisa el staged diff antes del commit.</li>
+              <li>Haz commits conceptuales y pequeños.</li>
+              <li>Sincroniza antes de empezar trabajo conflictivo.</li>
+              <li>Usa ramas cortas para reducir divergencia.</li>
+              <li>Protege <code>main</code> en equipos.</li>
+              <li>Usa <code>reflog</code> antes de asumir que algo se perdió.</li>
+            </ul>
+          </article>
+          <article class="dont">
+            <h3>Evita</h3>
+            <ul>
+              <li>Commit de secretos, claves o <code>.env</code>.</li>
+              <li><code>git add .</code> ciego en repos grandes.</li>
+              <li><code>push --force</code> sobre ramas compartidas.</li>
+              <li>Rebase arbitrario de historia pública.</li>
+              <li>Commits gigantes con muchas ideas mezcladas.</li>
+              <li>Usar Git como almacén de binarios pesados sin estrategia.</li>
+              <li>Arreglar conflictos sin entender ambas intenciones.</li>
+            </ul>
+          </article>
+        </div>
+
+        <h3>Una estructura de mensaje útil</h3>
+        <pre><code>Añade caché a consultas de catálogo
+
+Evita repetir consultas idénticas durante 30 segundos.
+Reduce carga sin cambiar la API pública.</code></pre>
+
+        <p>
+          El título cuenta <strong>qué</strong> cambia; el cuerpo explica <strong>por qué</strong>,
+          especialmente cuando la decisión no es obvia leyendo el diff.
+        </p>
+      </section>
+
+      <section id="laboratorio" class="section searchable" data-keywords="interactive simulator lab wd staging commit">
+        <div class="section-kicker">15 · LABORATORIO INTERACTIVO</div>
+        <h2>Mueve un archivo por las tres zonas</h2>
+        <p>
+          Simula el ciclo de vida de <code>app.js</code>. El panel intenta representar el modelo mental de Git,
+          no ejecutar Git real.
+        </p>
+
+        <div class="lab">
+          <div class="lab-controls">
+            <button data-action="edit">✎ Editar archivo</button>
+            <button data-action="add">＋ git add app.js</button>
+            <button data-action="commit">● git commit</button>
+            <button data-action="unstage">↶ restore --staged</button>
+            <button data-action="restore">⟲ restore app.js</button>
+            <button data-action="reset">↺ Reiniciar demo</button>
+          </div>
+
+          <div class="lab-zones">
+            <div class="lab-zone">
+              <span>WORKING DIRECTORY</span>
+              <strong id="wdState">limpio</strong>
+              <small id="wdDetail">app.js coincide con staging</small>
+            </div>
+            <div class="lab-zone">
+              <span>STAGING / INDEX</span>
+              <strong id="stageState">sin cambios</strong>
+              <small id="stageDetail">coincide con HEAD</small>
+            </div>
+            <div class="lab-zone">
+              <span>REPOSITORY</span>
+              <strong id="repoState">commit C1</strong>
+              <small id="repoDetail">HEAD → main → C1</small>
+            </div>
+          </div>
+
+          <pre id="labTerminal" class="terminal"><code>$ git status
+On branch main
+nothing to commit, working tree clean</code></pre>
+        </div>
+      </section>
+
+      <section id="chuleta" class="section searchable" data-keywords="cheat sheet commands quick reference">
+        <div class="section-kicker">16 · CHULETA RÁPIDA</div>
+        <h2>Mapa de comandos por intención</h2>
+
+        <div class="cheat-grid">
+          <article><h3>Preparar</h3><code>git status</code><code>git diff</code><code>git add -p</code><code>git diff --staged</code></article>
+          <article><h3>Confirmar</h3><code>git commit</code><code>git commit --amend</code><code>git show</code></article>
+          <article><h3>Ramas</h3><code>git switch -c rama</code><code>git branch -vv</code><code>git merge rama</code><code>git rebase main</code></article>
+          <article><h3>Temporal</h3><code>git stash push -m "WIP"</code><code>git stash list</code><code>git stash pop</code></article>
+          <article><h3>Remoto</h3><code>git fetch</code><code>git pull --rebase</code><code>git push -u origin rama</code></article>
+          <article><h3>Deshacer</h3><code>git restore</code><code>git restore --staged</code><code>git revert</code><code>git reflog</code></article>
+          <article><h3>Historia</h3><code>git log --oneline --graph --all</code><code>git diff A..B</code><code>git blame</code></article>
+          <article><h3>Precisión</h3><code>git cherry-pick</code><code>git bisect</code><code>git worktree</code><code>git tag -a</code></article>
+        </div>
+
+        <div class="final-rule">
+          <h3>La pregunta que ordena casi todo Git</h3>
+          <p>
+            <strong>“¿Qué referencia estoy moviendo, y entre qué dos estados estoy comparando?”</strong>
+          </p>
+          <p>Si puedes responder eso, la mayoría de comandos deja de parecer magia.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <p>Guía didáctica de Git · diseñada para estudiar el modelo mental antes de memorizar comandos.</p>
+    <a href="#inicio">↑ Volver arriba</a>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

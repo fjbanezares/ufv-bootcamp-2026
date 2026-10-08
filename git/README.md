@@ -26,6 +26,9 @@ Colección completa de láminas visuales en alta resolución que condensan cada 
 ### 3. 🎬 [Práctica Colaborativa: El Desafío Inception Scope](./practica-inception/README.md)
 Ejercicio guiado de trabajo en ramas donde los alumnos aplican el flujo real de creación de ramas (`feature/...`), mejora de scripts en Python con niveles de sueño, resolución de merge y push a GitHub.
 
+### 4. 🚀 [Práctica: Despliegue Selectivo y Clon Ligero](./practica_despliegue_selectivo/README.md)
+Aprende a separar el taller de trabajo (`main` con fuentes LaTeX, PDFs y utilidades) del escaparate de producción (`web-prod` como rama huérfana y etiquetado con `tags`), aplicando **clones selectivos y superficiales** (`--single-branch --depth 1`) para alojar únicamente lo indispensable en servidores como IONOS / 1&1.
+
 ---
 
 ## ⚡ Chuleta Rápida de Comandos

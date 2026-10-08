@@ -12,6 +12,9 @@ Guía completa dividida en 12 módulos temáticos con explicaciones paso a paso,
 ### 2. 🎨 [Infografía Visual Oficial: Visual Studio Code](./vscode.png)
 Lámina infográfica en alta resolución que condensa la anatomía del editor, los atajos de teclado clave, las extensiones recomendadas, la comparativa con otros IDEs y los flujos de Git y depuración.
 
+### 3. 🤖 [Submódulo: Google Antigravity en VS Code](./Antigravity/README.md)
+Curso profundo de programación asistida por agentes autónomos, con 6 infografías temáticas, atajos de layout (`Ctrl + J`, `Ctrl + Alt + B`), ventajas y riesgos de la IA, y laboratorios prácticos en [CURSO_ANTIGRAVITY.md](./Antigravity/CURSO_ANTIGRAVITY.md).
+
 ---
 
 ## ⚡ Chuleta Rápida de Atajos Esenciales

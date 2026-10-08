@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" width="300" height="400">
+  <rect width="300" height="400" fill="#003366" rx="8"/>
+  <text x="150" y="160" fill="#ffffff" font-size="28" font-family="sans-serif" font-weight="bold" text-anchor="middle">MI LIBRO</text>
+  <text x="150" y="210" fill="#99ccff" font-size="16" font-family="sans-serif" text-anchor="middle">Edición Producción</text>
+  <rect x="50" y="260" width="200" height="4" fill="#ff9900"/>
+</svg>
