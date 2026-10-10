@@ -294,6 +294,8 @@ git commit -m "Proyecto completo del libro"
 git branch -M main
 ```
 
+> **Nota sobre `-M`**: `-m` significa `--move` (renombrar rama). La `-M` en mayúscula equivale a `--move --force`. Fuerza el renombrado de la rama actual a `main` (por si Git la creó por defecto con el nombre antiguo `master`), evitando cualquier error si ya existiera una rama llamada `main`.
+
 Ahora tenemos:
 
 ```text
@@ -327,23 +329,25 @@ Add license
 
 porque nuestro repositorio local ya existe.
 
-GitHub nos dará una URL parecida a:
+GitHub nos dará dos tipos de URL:
+- **HTTPS (Recomendada si no tienes claves SSH configuradas)**: `https://github.com/TU_USUARIO/demo-libro.git`
+- **SSH (Requiere clave pública en GitHub)**: `git@github.com:TU_USUARIO/demo-libro.git`
 
-```text
-git@github.com:TU_USUARIO/demo-libro.git
-```
-
-Añadimos el remoto:
+Añadimos el remoto (ejemplo con HTTPS):
 
 ```bash
-git remote add origin git@github.com:TU_USUARIO/demo-libro.git
+git remote add origin https://github.com/TU_USUARIO/demo-libro.git
 ```
+
+*(O si prefieres SSH: `git remote add origin git@github.com:TU_USUARIO/demo-libro.git`)*
 
 Subimos `main`:
 
 ```bash
 git push -u origin main
 ```
+
+> **Aviso sobre permisos**: Aunque el repositorio sea público, GitHub **siempre exige autenticación para `git push`** para verificar que eres el propietario. Si usas SSH y no has subido tu clave pública a GitHub, recibirás un error `Permission denied (publickey)`. En ese caso, utiliza la URL HTTPS o configura tu clave SSH como se explica a continuación.
 
 ---
 

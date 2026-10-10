@@ -29,6 +29,9 @@ Ejercicio guiado de trabajo en ramas donde los alumnos aplican el flujo real de 
 ### 4. 🚀 [Práctica: Despliegue Selectivo y Clon Ligero](./practica_despliegue_selectivo/README.md)
 Aprende a separar el taller de trabajo (`main` con fuentes LaTeX, PDFs y utilidades) del escaparate de producción (`web-prod` como rama huérfana y etiquetado con `tags`), aplicando **clones selectivos y superficiales** (`--single-branch --depth 1`) para alojar únicamente lo indispensable en servidores como IONOS / 1&1.
 
+### 5. 🧭 [Guía Definitiva y Laboratorio: `git reset`](./git_reset/README.md)
+Domina el control del tiempo en Git a través de sus 3 infografías: las tres versiones (Working Dir, Index, HEAD), los tres modos de retroceso (`--soft`, `--mixed`, `--hard`), descifrado de la sintaxis `HEAD~` vs `HEAD^`, prácticas guiadas de laboratorio y comparativa exhaustiva frente a `git rebase` y `git revert`.
+
 ---
 
 ## ⚡ Chuleta Rápida de Comandos
