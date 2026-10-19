@@ -1,0 +1,69 @@
+1. Presentaciones, muy importante, de hecho en la vida lo primero que debieramos buscar es aquello que los jaoponeses llaman el Ikigai que es el propósito, la búsqueda del propósito, qué queremos hacer en la vida que nuestra presecia en el mundo sea fructifera para el mundo y para nosotros, sobre todo remar en una dirección porque muchas veces en la vida estaomos caminando a ningún sitio, lo que tambié tiene valor pero si direccionamos el barco multiplicamos el valor. Por eso saber quién es el alumno, de donde viene, a donde va, también sus conocimientos previos para hacernos una primera impresión de donde poner más el énfasis en las clases. Estos primeros minutos de presentaciones son fundamentales a la hora de poner el rumbo del barco que es cada alumno.
+
+2. Introducción a los perfiles en el mundo de los datos, en el marco estrictamente material este master a donde nos lleva:
+
+    - cualquier rol con un conocimiento tecnologico que cada día viene mejor.
+    - un rol específico de analista de datos cada vez más demandado.
+    - un rol técnico específico con posiciones de ingenieria de datos
+        --> ingeniero de Big Data
+        --> ingeniero de Machine Learning
+        --> Ingeniero de arquitectura cloud
+        --> Data Scientist
+        --> estrictamente
+
+3. El Síndrome del Impostor. Presente en toda vida, ya decían los sabios que cuanto más sabes menos crees que sabes.
+    Pero en este mundo ingente, donde solo actuamos sobre los hombros de otros, es Omnipresente.
+        Sobre todo si llegamos a ganar las ingentes cantidades salariales que pueden estar asociadas a estos roles...
+            También le puede pasar a un futbolista, pero el futbol es un juego sencillo
+                Este juego es muy complejo y estar perdido es la norma, siempre pareciendo que los demás saben más.
+                    Sobre todo los que no son humildes, siendo la humildad lo que debiera ser la másxima de cualquier gran profesional, o persona.
+
+
+4. Sistemas Operativos en general, Linux en particular.
+    Los átomos generan chips, estos circuitos digitales con ceros y unos a falta de ordenadores cuanticos que tendran mas estados.
+        Estos ceros y unos en el disco pueden construir palabras y conceptos sobre los cuales cómo podemos desarrollar programas logicos, juegos, etc...
+            En los Ssitemas Operativos ocurre como con los modelos de IA, los usamos y confiamos que lo que está por debajo está bien hecho.
+                Estamos caminando a hombros de gigantes.
+                    En este caso un nombre propio: Linus Torvalds.
+                        Aprendió de Unix y creyó en una forma colaborativa de desarrollar algo tan ingente
+                            Muuuuchas, MUCHAs, personas han contribuido a crear Linux.
+                                Luego se ha convertido en una máxima el SW colaborativo colaborando con empresas privadas. 
+                                    Pero hizo falta esa chispa.
+
+
+5. Introduccion a Linux
+    Sistema de gestion de archivos, el uso en el dia a dia
+        El Inodo 
+            Otros Sistemas como Fatca etc
+                comandos de navegacion: ls, mv, mkdir,...
+                    comandos y aplicaciones ver archivos: cat, more, less, vim, nano, etc
+
+
+6. Gastion de usuarios, la seguridad quien es quien y que puede hacer quien
+    whoami, chmod, etc ...
+
+7. conexion de red, comunicacion con el exterior y el interior
+    puertos libres
+        gestion ip 
+            iptables, firewalls proteccion a nivel de Linux 
+
+
+8. Shell scripting basico, ejemplos sencillos
+
+
+9. Introduccion a los sistemas de conrtol de versiones, la necesidad de ser organizados
+    ramas
+        wd
+            staging area 
+                commits
+
+10. repositorios git, la necesidad de compartir
+    push
+        pull
+            estrategias de compartir
+
+11. conflictos y como resolveros
+
+12. html, css y javascript basico, las paginas web o como hacer las presentaciones 
+    - prectica sencilla de hacer u CV basico, con un par de modificaciones usando git y desplegar en github pages
+                                        
