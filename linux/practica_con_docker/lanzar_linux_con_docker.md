@@ -231,3 +231,256 @@ Aprovechando que estás dentro del contenedor Ubuntu, puedes probar cualquiera d
 28. **`history`**: Muestra la lista numerada de todos los comandos que has escrito durante la sesión. (Truco: puedes pulsar la **flecha hacia arriba `↑`** del teclado para recuperar comandos anteriores).
 29. **`clear`** (o el atajo **`Ctrl + L`**): Limpia toda la pantalla de la terminal dejando el cursor arriba del todo.
 30. **`exit`**: Cierra la sesión de Linux. Al haber lanzado nuestro contenedor de Docker con la opción `--rm`, escribir `exit` apagará y eliminará limpiamente nuestra máquina de pruebas devolviéndonos a la terminal de nuestro ordenador.
+
+---
+
+## 4. Práctica Avanzada: Conexión Multiventana y Secuencia Guiada de Comandos
+
+En el mundo real de los servidores y el desarrollo profesional nunca se trabaja con una única ventana de terminal. Es muy habitual tener **un proceso ejecutándose en una ventana** (por ejemplo, una base de datos o un servidor web) y abrir **una segunda ventana** para conectarnos a la misma máquina, inspeccionar archivos, vigilar recursos o depurar problemas.
+
+Vamos a experimentar esta dinámica paso a paso.
+
+---
+
+### Paso A: Dejar nuestro contenedor en marcha (Ventana 1)
+
+Si aún tienes la terminal del **Paso 1** abierta con tu contenedor corriendo, ¡perfecto! Si no la tienes o la cerraste, arranca un contenedor asignándole un nombre reconocible para facilitarnos la vida:
+
+```bash
+docker run -it --name mi_linux ubuntu bash
+```
+
+> **Nota:** La opción `--name mi_linux` le da una etiqueta clara a nuestro contenedor para no tener que memorizar un identificador numérico aleatorio.
+
+Deja esta **Ventana 1** abierta con su consola `root@...:/#` visible.
+
+---
+
+### Paso B: Conectarse al mismo contenedor desde otra ventana (Ventana 2)
+
+1. Abre una **nueva ventana o pestaña** de tu aplicación Terminal (o PowerShell).
+2. Preguntémosle a Docker qué contenedores están encendidos en este momento:
+   ```bash
+   docker ps
+   ```
+   Verás una fila donde aparece la imagen `ubuntu` y al final su nombre (`mi_linux`).
+3. Ahora nos conectaremos al interior de **ese mismo contenedor que ya está vivo** utilizando el comando `docker exec`:
+   ```bash
+   docker exec -it mi_linux bash
+   ```
+
+> **¿Qué acaba de ocurrir?**  
+> `docker exec` ejecuta un nuevo programa dentro de un contenedor en marcha. Al pedirle `-it ... bash`, hemos abierto **una segunda puerta de acceso simultánea**. Ambas ventanas están compartiendo exactamente el mismo procesador, la misma memoria y el mismo sistema de archivos. Lo que hagas o crees en la Ventana 2 existirá de inmediato en la Ventana 1.
+
+---
+
+### Paso C: Una secuencia bonita y pedagógica de comandos en la Ventana 2
+
+Desde esta nueva ventana, sigue esta secuencia lógica de trabajo diseñada para asentar los 30 comandos que vimos anteriormente como si fueras un auténtico administrador de sistemas:
+
+#### 1. Reconocimiento e identidad: ¿Quién soy y dónde estoy?
+```bash
+whoami
+pwd
+uname -a
+```
+* Compruebas que eres el usuario `root` (superadministrador), que estás situado en el directorio raíz `/` y ves los detalles del kernel Linux.
+
+#### 2. Auditoría rápida de recursos: ¿Cómo está de salud la máquina?
+```bash
+df -h
+free -h
+```
+* Ves el espacio disponible en disco (`df -h`) y el consumo de memoria RAM (`free -h`). En contenedores ligeros verás consumos mínimos de apenas unos megabytes.
+
+#### 3. Exploración del terreno y creación del espacio de trabajo
+```bash
+ls -la /
+mkdir /workspace
+cd /workspace
+pwd
+```
+* Listas el sistema raíz viendo permisos y archivos ocultos (`ls -la`), creas una carpeta de proyecto (`mkdir /workspace`), entras en ella (`cd`) y confirmas tu nueva ubicación (`pwd`).
+
+#### 4. Generación y edición de contenido
+```bash
+touch app.log
+echo "Servicio iniciado correctamente" > app.log
+echo "Conexión entrante desde 192.168.1.50" >> app.log
+echo "ADVERTENCIA: Memoria al 85%" >> app.log
+echo "ERROR: Fallo de autenticación para usuario anonimo" >> app.log
+echo "Servicio detenido por mantenimiento" >> app.log
+```
+* Creas un archivo con `touch` y utilizas `>` para escribir la primera línea y `>>` para añadir más líneas sin borrar lo anterior.
+
+#### 5. Lectura y conteo rápido
+```bash
+cat app.log
+wc -l app.log
+head -n 2 app.log
+tail -n 2 app.log
+```
+* `cat` te muestra todo el fichero; `wc -l` cuenta sus 5 líneas; `head` te enseña las dos primeras y `tail` las dos últimas.
+
+#### 6. Búsqueda y filtrado forense con `grep`
+```bash
+grep "ERROR" app.log
+grep -n "ADVERTENCIA" app.log
+```
+* Encuentras al instante las líneas críticas de tu registro de eventos.
+
+#### 7. Seguridad y permisos de ejecución
+Vamos a crear un pequeño script de mantenimiento:
+```bash
+printf '#!/bin/bash\necho "Auditoría en curso..."\ndate\n' > informe.sh
+ls -l informe.sh
+chmod +x informe.sh
+ls -l informe.sh
+./informe.sh
+```
+* Observa cómo antes de `chmod +x` el archivo no tenía permisos de ejecución (`-rw-r--r--`). Tras `chmod +x`, los permisos cambian a `-rwxr-xr-x` (a menudo coloreado en verde) y Linux te permite ejecutarlo directamente con `./informe.sh`.
+
+#### 8. Monitorización de procesos activos
+```bash
+ps aux
+```
+* Verás la lista de procesos: verás los dos intérpretes de comandos `bash` correspondientes a la **Ventana 1** y a la **Ventana 2**.
+
+#### 9. Historial y limpieza
+```bash
+history | tail -n 15
+clear
+```
+* Repasas los últimos comandos que has escrito para recordar los pasos dados y dejas tu terminal impecable con `clear`.
+
+---
+
+## 5. Discusión Clave: El Modo Desacoplado (*Detach* `-d`), Procesos en Segundo Plano y ¿Dónde va la Salida Estándar (*stdout*)?
+
+Uno de los conceptos más importantes y que más confunden a quienes empiezan en Linux y Docker es la diferencia entre ejecutar un programa en **primer plano (*foreground*)** y en **segundo plano o modo desacoplado (*detached / background*)**.
+
+---
+
+### 1. ¿Qué es el modo interactivo vs el modo Detach?
+
+Hasta ahora hemos lanzado contenedores con:
+```bash
+docker run -it ...
+```
+* Aquí, **tu teclado está físicamente atado a la entrada del contenedor** y **tu pantalla está atada a su salida**. Si el contenedor imprime algo, lo ves en directo; si pulsas `Ctrl + C` o escribes `exit`, el proceso principal finaliza y el contenedor se apaga.
+
+En cambio, en servidores de producción (bases de datos, APIs web, bots) no queremos una terminal ocupada. Para ello usamos la opción **`-d`** (*detached* o desacoplado):
+```bash
+docker run -d --name mi_servidor nginx
+```
+* Docker descarga y arranca el contenedor, pero **te devuelve el control de tu terminal inmediatamente**. En la pantalla solo ves un código largo (el identificador único del contenedor).
+
+---
+
+### 2. El misterio: Si está desacoplado, ¿dónde va la Salida Estándar (*stdout*)?
+
+En los sistemas operativos tipo Unix/Linux, todo proceso que arranca dispone de tres canales de comunicación automáticos llamados **flujos estándar (*Standard Streams*)**:
+
+```
+                  +-----------------------------------+
+[ Teclado ] ----->| 0: stdin  (Entrada Estándar)      |
+                  |                                   |
+                  |          PROCESO LINUX            |
+                  |                                   |
+                  | 1: stdout (Salida Estándar: info) |---> [ Pantalla ]
+                  | 2: stderr (Salida de Error)       |---> [ Pantalla ]
+                  +-----------------------------------+
+```
+
+1. **`stdin` (0 - Entrada estándar):** Por donde el proceso recibe datos (habitualmente tu teclado).
+2. **`stdout` (1 - Salida estándar):** Por donde el proceso emite sus mensajes normales y resultados.
+3. **`stderr` (2 - Salida de errores):** Canal independiente reservado para mensajes de error y advertencias.
+
+Cuando un proceso se ejecuta con **detach (`-d`)**, se **desconectan la pantalla y el teclado** de ese proceso. El programa sigue ejecutándose y sigue emitiendo datos por `stdout`, pero **no hay ningún cristal de terminal acoplado para renderizar esos caracteres**.
+
+¿Significa eso que la información se ha perdido para siempre? **Rotundamente no.** Y aquí es donde entran las dos grandes soluciones del mundo Linux y Docker.
+
+---
+
+### 3. Solución A: A nivel de Docker con `docker logs`
+
+Docker actúa como una "caja negra inteligente". Cada vez que un contenedor en modo `-d` emite algo por `stdout` o `stderr`, el *Docker Daemon* lo intercepta silenciosamente y lo almacena en un archivo de registro interno (*json-file logging driver*).
+
+Para inspeccionar esa salida desde el exterior tenemos dos opciones:
+
+#### Ver los mensajes acumulados hasta el momento:
+```bash
+docker logs mi_servidor
+```
+Muestra todo el historial de texto que el proceso ha generado desde que arrancó.
+
+#### "Cazar" la salida en vivo (como si estuviéramos mirando la pantalla):
+```bash
+docker logs -f mi_servidor
+```
+> La opción **`-f`** (*follow*) mantiene abierta la conexión con los logs: a medida que el proceso en segundo plano escriba nuevas líneas, irán apareciendo en tu terminal en tiempo real. Para salir basta pulsar **`Ctrl + C`** (esto solo desconecta tu visor de logs, el contenedor continúa funcionando plácidamente de fondo).
+
+---
+
+### 4. Solución B: A nivel de Linux nativo (Redirecciones y segundo plano)
+
+Dentro del propio Linux ocurre exactamente lo mismo cuando ejecutamos un script o comando y no queremos que bloquee nuestra sesión. Si ejecutas:
+
+```bash
+python3 servicio.py &
+```
+El símbolo **`&`** al final envía el proceso a segundo plano (*background*). Sin embargo, si ese programa sigue imprimiendo mensajes por `stdout`, estos seguirán apareciendo en mitad de tu pantalla mientras intentas escribir otros comandos, lo cual es muy molesto. Y peor aún: si cierras la ventana de terminal, el proceso podría morir.
+
+La práctica profesional en Linux consiste en **redirigir explícitamente los flujos a un archivo físico de registro (*log file*)**:
+
+```bash
+./mi_proceso.sh > salida.log 2>&1 &
+```
+
+Desglosemos esta "fórmula mágica" que todo desarrollador debe dominar:
+* **`> salida.log`**: Desvía el canal 1 (`stdout`) hacia el archivo `salida.log`.
+* **`2>&1`**: Conecta el canal 2 (`stderr`, errores) al mismo destino que el canal 1 (`stdout`), de modo que tanto los mensajes normales como los errores queden registrados juntos en el mismo fichero.
+* **`&`**: Libera tu terminal ejecutando todo en segundo plano.
+
+#### ¿Cómo revisamos la salida en otra ventana?
+Ahora que la salida está a buen recaudo en `salida.log`, abrimos nuestra segunda ventana de terminal y usamos el comando **`tail -f`**:
+```bash
+tail -f salida.log
+```
+* `tail -f` monitoriza el archivo y te muestra en vivo cada nueva línea que el programa en segundo plano va escribiendo.
+
+---
+
+### 5. Experimento de Laboratorio: Ponlo a prueba ahora mismo
+
+Comprobemos todo esto empíricamente con dos ventanas:
+
+#### En la Ventana 1 (Máquina anfitriona):
+Lanza un contenedor desacoplado (`-d`) que actúe como un "reloj emisor" imprimiendo la hora cada 2 segundos:
+```bash
+docker run -d --name emisor_hora ubuntu bash -c "while true; do echo \"[TIC-TAC] Son las \$(date +%T)\"; sleep 2; done"
+```
+* Fíjate que tu terminal te devuelve el control de inmediato. No ves ningún texto de "TIC-TAC".
+
+#### En la Ventana 2:
+1. Comprueba que el contenedor está vivo:
+   ```bash
+   docker ps
+   ```
+2. Caza la salida estándar en directo:
+   ```bash
+   docker logs -f emisor_hora
+   ```
+   * ¡Ahí están! Cada 2 segundos verás brotar una nueva línea con la hora exacta.
+3. Pulsa `Ctrl + C` para dejar de ver los logs (el contenedor sigue funcionando).
+4. Ahora entra dentro del contenedor para ver su proceso activo:
+   ```bash
+   docker exec -it emisor_hora ps aux
+   ```
+   * Verás el bucle `bash` y el comando `sleep` activos.
+
+#### Limpieza final al terminar la práctica:
+Una vez terminadas tus pruebas, apaga y elimina el contenedor de prueba con:
+```bash
+docker rm -f emisor_hora
+```
