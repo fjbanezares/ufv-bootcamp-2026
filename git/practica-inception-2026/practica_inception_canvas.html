@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Práctica Oficial de Git y Python Scopes para Canvas - Bootcamp UFV 2026. Flujo de ramas, commits, Pull Requests protegidos y resolución LEGB en Python.">
+  <title>Práctica Oficial: El Desafío Inception · Git, Scopes y Pull Requests | Bootcamp UFV 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #0b0f19;
+      --bg-surface: #111827;
+      --bg-card: #162032;
+      --bg-card-hover: #1e293b;
+      --border: #233247;
+      --border-accent: #38bdf8;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      --brand: #38bdf8;
+      --brand-glow: rgba(56, 189, 248, 0.2);
+      --accent-green: #34d399;
+      --accent-purple: #c084fc;
+      --accent-amber: #fbbf24;
+      --accent-rose: #f43f5e;
+      --accent-cyan: #22d3ee;
+
+      --code-bg: #090d16;
+      --code-border: #1e293b;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --font-serif: 'Lora', Georgia, serif;
+
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 16px 36px -8px rgba(0, 0, 0, 0.6);
+      --shadow-glow: 0 0 25px var(--brand-glow);
+    }
+
+    [data-theme="light"] {
+      --bg-page: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f1f5f9;
+      --border: #e2e8f0;
+      --border-accent: #0284c7;
+
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
+
+      --brand: #0284c7;
+      --brand-glow: rgba(2, 132, 199, 0.15);
+      --accent-green: #059669;
+      --accent-purple: #7c3aed;
+      --accent-amber: #d97706;
+      --accent-rose: #e11d48;
+      --accent-cyan: #0891b2;
+
+      --code-bg: #1e293b;
+      --code-border: #334155;
+
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 16px 36px -8px rgba(0, 0, 0, 0.1);
+      --shadow-glow: 0 0 20px rgba(2, 132, 199, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.75;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Container for Canvas / LMS */
+    .canvas-container {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 32px 24px 80px 24px;
+    }
+
+    /* Top Action Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .top-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--brand);
+    }
+
+    .theme-toggle-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--brand);
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(192, 132, 252, 0.08) 50%, rgba(52, 211, 153, 0.05) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 40px 36px;
+      margin-bottom: 36px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, var(--brand-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--brand);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 14px;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .hero-title span {
+      background: linear-gradient(90deg, var(--brand), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 820px;
+      margin-bottom: 24px;
+    }
+
+    /* Meta Cards Grid */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .meta-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+    }
+
+    .meta-card-label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .meta-card-val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Table of Contents & Quick Navigation */
+    .toc-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+
+    .toc-header {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--brand);
+    }
+
+    .toc-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 10px;
+      list-style: none;
+    }
+
+    .toc-list li a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .toc-list li a:hover {
+      background: var(--bg-card-hover);
+      color: var(--brand);
+      transform: translateX(4px);
+    }
+
+    /* Section Styling */
+    .section-module {
+      margin-bottom: 50px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.25s ease;
+    }
+
+    .section-module:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 18px;
+    }
+
+    .step-number {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--brand), var(--accent-purple));
+      color: #0b0f19;
+      font-weight: 900;
+      font-size: 1.25rem;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px var(--brand-glow);
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+
+    .section-desc {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Callouts & Alerts */
+    .callout {
+      border-left: 4px solid var(--brand);
+      background: rgba(56, 189, 248, 0.06);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: 0.95rem;
+    }
+
+    .callout-warning {
+      border-left-color: var(--accent-amber);
+      background: rgba(251, 191, 36, 0.08);
+    }
+
+    .callout-danger {
+      border-left-color: var(--accent-rose);
+      background: rgba(244, 63, 94, 0.08);
+    }
+
+    .callout-success {
+      border-left-color: var(--accent-green);
+      background: rgba(52, 211, 153, 0.08);
+    }
+
+    .callout-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .callout-warning .callout-title {
+      color: var(--accent-amber);
+    }
+
+    .callout-danger .callout-title {
+      color: var(--accent-rose);
+    }
+
+    .callout-success .callout-title {
+      color: var(--accent-green);
+    }
+
+    /* Code Blocks with Copy Button */
+    .code-container {
+      position: relative;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: var(--radius-md);
+      margin: 18px 0;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .code-header {
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid var(--code-border);
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+
+    .copy-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--brand);
+      color: #0b0f19;
+      border-color: var(--brand);
+    }
+
+    pre {
+      padding: 16px 20px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--brand);
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* Diagram / Inception Layers Visual */
+    .inception-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .layer-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: transform 0.2s ease;
+      background: var(--bg-card);
+    }
+
+    .layer-card:hover {
+      transform: scale(1.01);
+    }
+
+    .layer-card.global {
+      border-left: 6px solid #38bdf8;
+    }
+
+    .layer-card.enclosing-1 {
+      border-left: 6px solid #818cf8;
+      margin-left: 20px;
+    }
+
+    .layer-card.enclosing-2 {
+      border-left: 6px solid #c084fc;
+      margin-left: 40px;
+    }
+
+    .layer-card.enclosing-3 {
+      border-left: 6px solid #f472b6;
+      margin-left: 60px;
+    }
+
+    .layer-card.limbo {
+      border-left: 6px solid #fb7185;
+      margin-left: 80px;
+      background: rgba(244, 63, 94, 0.06);
+    }
+
+    .layer-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .layer-scope-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Comparison Table */
+    .styled-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.92rem;
+    }
+
+    .styled-table th,
+    .styled-table td {
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    .styled-table th {
+      background: rgba(255, 255, 255, 0.04);
+      font-weight: 700;
+      color: var(--brand);
+    }
+
+    .styled-table tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Checklist Box */
+    .checklist-box {
+      background: rgba(52, 211, 153, 0.06);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    .checklist-title {
+      color: var(--accent-green);
+      font-weight: 800;
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+    }
+
+    .checklist-checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 2px solid var(--accent-green);
+      background: transparent;
+      margin-top: 2px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    /* Rubric Card */
+    .rubric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .rubric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+    }
+
+    .rubric-pts {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent-purple);
+      margin-bottom: 4px;
+    }
+
+    .rubric-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    .canvas-footer {
+      text-align: center;
+      margin-top: 50px;
+      padding-top: 30px;
+      border-top: 1px solid var(--border);
+      font-size: 0.88rem;
+      color: var(--text-dim);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .canvas-container {
+        padding: 16px 12px 60px 12px;
+      }
+
+      .hero-banner {
+        padding: 24px 18px;
+      }
+
+      .hero-title {
+        font-size: 1.65rem;
+      }
+
+      .section-module {
+        padding: 24px 16px;
+      }
+
+      .layer-card.enclosing-1,
+      .layer-card.enclosing-2,
+      .layer-card.enclosing-3,
+      .layer-card.limbo {
+        margin-left: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="canvas-container">
+
+    <!-- Top Action Bar -->
+    <div class="top-bar">
+      <div class="top-brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+          <path d="M2 12h20"></path>
+        </svg>
+        <span>Bootcamp UFV 2026 · Sistemas y Python</span>
+      </div>
+      <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <span id="theme-text">Modo Claro</span>
+      </button>
+    </div>
+
+    <!-- Hero Banner -->
+    <header class="hero-banner">
+      <div class="badge-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        Práctica Calificada Obligatoria
+      </div>
+      <h1 class="hero-title">El Desafío Inception: <span>Ramas Git, Python Scopes y Pull Requests</span></h1>
+      <p class="hero-subtitle">
+        Aprenderás a operar exactamente como un ingeniero de software en un equipo real: bifurcarás tu propia rama de
+        trabajo, dominarás la regla <strong>LEGB</strong> y los saltos de ámbito en Python con la arquitectura de sueños
+        de <em>Origen</em>, y enviarás tus cambios mediante un <strong>Pull Request</strong> sobre una rama
+        <code>main</code> protegida en GitHub.
+      </p>
+
+      <div class="meta-grid">
+        <div class="meta-card">
+          <div class="meta-card-label">Modalidad</div>
+          <div class="meta-card-val">Individual con fusión grupal</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-card-label">Duración Estimada</div>
+          <div class="meta-card-val">60 - 90 minutos</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-card-label">Entregable en Canvas</div>
+          <div class="meta-card-val">Enlace PR + Vídeo (&lt; 1 min)</div>
+        </div>
+        <div class="meta-card">
+          <div class="meta-card-label">Repositorio Remoto</div>
+          <div class="meta-card-val"><code>fjbanezares/ufv-bootcamp-2026</code></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Table of Contents -->
+    <nav class="toc-card">
+      <div class="toc-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Ruta de la Práctica (Índice de Módulos)
+      </div>
+      <ul class="toc-list">
+        <li><a href="#modulo-0">0. Puesta a Punto del Entorno (IDE y Git Pull)</a></li>
+        <li><a href="#modulo-1">1. ¿Qué es una Rama? Creando tu Workspace Aislado</a></li>
+        <li><a href="#modulo-2">2. Python LEGB y el Misterio de Inception</a></li>
+        <li><a href="#modulo-3">3. La Tarea: Tu Análisis Personal de Scopes</a></li>
+        <li><a href="#modulo-4">4. Ciclo Local de Git y tu Mejor Amigo: <code>git log</code></a></li>
+        <li><a href="#modulo-5">5. Subir la Rama, Committers y el Pull Request</a></li>
+        <li><a href="#modulo-6">6. Entrega Oficial y Rúbrica en Canvas</a></li>
+      </ul>
+    </nav>
+
+    <!-- =====================================================================
+         MÓDULO 0: PUESTA A PUNTO
+         ===================================================================== -->
+    <section class="section-module" id="modulo-0">
+      <div class="section-header">
+        <div class="step-number">0</div>
+        <div>
+          <h2 class="section-title">Puesta a Punto del Entorno (IDE y Git Pull)</h2>
+          <p class="section-desc">Cómo preparar tus herramientas de trabajo y sincronizar el repositorio sin romper
+            nada.</p>
+        </div>
+      </div>
+
+      <p>
+        Para realizar esta práctica utilizaremos **Antigravity IDE** (o Visual Studio Code) junto a la consola de
+        comandos de Git (**Git Bash** en Windows, o la **Terminal** en macOS / Linux).
+      </p>
+
+      <h3 style="margin: 20px 0 10px; font-size: 1.15rem; color: var(--brand);">A. Si ya clonaste el repositorio en
+        clase (Caso General)</h3>
+      <p>
+        Abre tu terminal dentro de la carpeta del repositorio y realiza estas dos comprobaciones obligatorias antes de
+        tocar nada:
+      </p>
+
+      <div class="callout">
+        <div class="callout-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          1. Verificar el Servidor Remoto con <code>git remote -v</code>
+        </div>
+        <p>
+          El comando <code>git remote -v</code> muestra con qué servidor central de GitHub está emparejado tu ordenador:
+        </p>
+        <div class="code-container">
+          <div class="code-header">
+            <span>Terminal / Git Bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+          </div>
+          <pre><code>git remote -v</code></pre>
+        </div>
+        <p>Debe responderte con la URL oficial de la clase:</p>
+        <div class="code-container">
+          <div class="code-header"><span>Salida esperada</span></div>
+          <pre><code>origin  https://github.com/fjbanezares/ufv-bootcamp-2026.git (fetch)
+origin  https://github.com/fjbanezares/ufv-bootcamp-2026.git (push)</code></pre>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 8px;">
+          * <strong>origin</strong> es el alias por defecto que recibe el repositorio remoto en la nube.<br>
+          * <strong>fetch</strong> es la ruta de donde descargas datos y <strong>push</strong> hacia donde los subes.
+        </p>
+      </div>
+
+      <div class="callout callout-success">
+        <div class="callout-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          2. Traer la nueva práctica con <code>git pull</code>
+        </div>
+        <p>
+          <code>git pull</code> es una orden compuesta que hace dos cosas en un solo paso:
+          1. <strong>Fetch:</strong> Descarga todos los commits y carpetas nuevas que el profesor ha publicado en
+          GitHub.
+          2. <strong>Merge:</strong> Las fusiona automáticamente dentro de tu copia local.
+        </p>
+        <div class="code-container">
+          <div class="code-header">
+            <span>Terminal / Git Bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+          </div>
+          <pre><code>git checkout main
+git pull origin main</code></pre>
+        </div>
+        <p>Comprueba que ya puedes ver la carpeta de la práctica ejecutando:</p>
+        <div class="code-container">
+          <div class="code-header">
+            <span>Terminal / Git Bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+          </div>
+          <pre><code>ls -la git/practica-inception-2026/</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-danger">
+        <div class="callout-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          🚨 ¿Te ha fallado el <code>git pull</code>? Aquí tienes la solución
+        </div>
+        <p>
+          Si al hacer <code>git pull</code> la terminal te escupe un error como: <em>"Your local changes to the
+            following files would be overwritten by merge"</em> o te indica que tus ramas han divergido, es porque
+          <strong>escribiste o modificaste archivos directamente en <code>main</code></strong>.
+        </p>
+        <p style="margin-top: 8px;"><strong>Paso de diagnóstico:</strong> Ejecuta <code>git status</code> para ver qué
+          tienes modificado.</p>
+        <ul style="margin: 10px 0 10px 24px; font-size: 0.92rem;">
+          <li><strong>Si solo son archivos tocados sin hacer commit:</strong> Restáuralos a su estado original con
+            <code>git restore .</code> (o guárdalos en un cajón temporal con <code>git stash</code>).</li>
+          <li><strong>Si hiciste un commit local en main:</strong> Puedes deshacerlo de forma limpia con
+            <code>git revert HEAD</code> (o sincronizar tu <code>main</code> de golpe con el del profesor ejecutando
+            <code>git reset --hard origin/main</code>).</li>
+        </ul>
+        <p>Una vez limpio, repite <code>git pull origin main</code> y verás la práctica al instante.</p>
+      </div>
+
+      <h3 style="margin: 26px 0 10px; font-size: 1.15rem; color: var(--brand);">B. Si eres nuevo o no tenías el
+        repositorio clonado</h3>
+      <p>
+        1. <strong>Instala Git:</strong> Descarga <a href="https://git-scm.com/downloads" target="_blank"
+          style="color: var(--brand);">Git para Windows (Git Bash)</a> o instálalo en Mac mediante
+        <code>brew install git</code>.<br>
+        2. <strong>Instala Antigravity IDE:</strong> Descarga e inicia Antigravity IDE (o Visual Studio Code).<br>
+        3. <strong>Configura tu identidad:</strong>
+      </p>
+      <div class="code-container">
+        <div class="code-header">
+          <span>Configuración Global de Git</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+        <pre><code>git config --global user.name "Tu Nombre y Apellidos"
+git config --global user.email "tu_email@alumnos.ufv.es"</code></pre>
+      </div>
+      <p>4. <strong>Clona el repositorio oficial de la clase:</strong></p>
+      <div class="code-container">
+        <div class="code-header">
+          <span>Clonar repositorio</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+        <pre><code>git clone https://github.com/fjbanezares/ufv-bootcamp-2026.git
+cd ufv-bootcamp-2026</code></pre>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         MÓDULO 1: RAMAS EN GIT
+         ===================================================================== -->
+    <section class="section-module" id="modulo-1">
+      <div class="section-header">
+        <div class="step-number">1</div>
+        <div>
+          <h2 class="section-title">¿Qué es una Rama? Creando tu Workspace Aislado</h2>
+          <p class="section-desc">Por qué nunca se programa en producción y cómo bifurcar tu propia línea temporal.</p>
+        </div>
+      </div>
+
+      <p>
+        Imagina que estás escribiendo un libro entre 14 autores. Si todos intentaran escribir al mismo tiempo en el
+        único folio que hay sobre la mesa, se tacharían unos a otros, se mancharían de tinta y el libro quedaría
+        destruido.
+      </p>
+      <p style="margin-top: 10px;">
+        En Git, una <strong>rama (branch)</strong> es una copia ligera e independiente de tu código. Es un puntero móvil
+        de apenas 41 bytes que te permite construir una realidad paralela:
+      </p>
+
+      <ul style="margin: 12px 0 16px 24px;">
+        <li>Puedes experimentar, equivocarte, borrar y probar sin miedo a romper el trabajo de los demás.</li>
+        <li>La rama principal (<strong><code>main</code></strong>) permanece siempre limpia, estable y funcionando al
+          100%.</li>
+        <li>Cuando tu trabajo esté terminado y validado por el profesor, tu rama se fusionará con <code>main</code>.
+        </li>
+      </ul>
+
+      <h3 style="margin: 20px 0 10px; font-size: 1.15rem; color: var(--accent-purple);">Crear tu rama de trabajo
+        personal</h3>
+      <p>
+        Vamos a crear una rama con una nomenclatura profesional que incluya tu nombre y apellidos:
+      </p>
+
+      <div class="code-container">
+        <div class="code-header">
+          <span>Crear y cambiar de rama</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+        <pre><code># Sintaxis clásica:
+git checkout -b feature/inception-tu-nombre-apellido
+
+# O con la sintaxis moderna de Git:
+git switch -c feature/inception-tu-nombre-apellido</code></pre>
+      </div>
+
+      <div class="callout callout-success">
+        <div class="callout-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Comprobación de Seguridad
+        </div>
+        <p>Ejecuta <code>git branch</code> en tu terminal. Verás un asterisco verde al lado de tu rama:</p>
+        <div class="code-container">
+          <div class="code-header"><span>Salida esperada</span></div>
+          <pre><code>* feature/inception-tu-nombre-apellido
+  main</code></pre>
+        </div>
+        <p>¡Felicidades! Todo lo que hagas a partir de este instante ocurrirá dentro de tu burbuja segura.</p>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         MÓDULO 2: PYTHON SCOPES & INCEPTION
+         ===================================================================== -->
+    <section class="section-module" id="modulo-2">
+      <div class="section-header">
+        <div class="step-number">2</div>
+        <div>
+          <h2 class="section-title">Python LEGB y el Misterio de Inception</h2>
+          <p class="section-desc">Entendiendo cómo Python busca y manipula variables a través de capas anidadas.</p>
+        </div>
+      </div>
+
+      <p>
+        Antes de mirar el código, asegúrate de tener listo tu entorno de desarrollo en **Antigravity IDE**:
+      </p>
+
+      <div class="callout">
+        <div class="callout-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          Activar la Extensión de Python en Antigravity IDE
+        </div>
+        <p>
+          1. En la barra lateral izquierda de Antigravity IDE, haz clic en el icono de <strong>Extensiones /
+            Plugins</strong> (icono de bloques o cuadrados).<br>
+          2. Escribe <strong>Python</strong> en el buscador.<br>
+          3. Asegúrate de que la extensión oficial de Python esté instalada y habilitada para disfrutar de coloreado de
+          sintaxis, autocompletado y depuración en vivo.
+        </p>
+      </div>
+
+      <h3 style="margin: 24px 0 12px; font-size: 1.2rem; color: var(--brand);">La Regla de Oro: El Ámbito LEGB</h3>
+      <p>
+        Cuando en Python utilizas una variable llamada <code>x</code>, el intérprete no la busca al azar. Sigue una
+        jerarquía estricta de 4 niveles conocida como **LEGB**:
+      </p>
+
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Ámbito</th>
+            <th>Significado</th>
+            <th>Equivalente en la película Inception</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>L - Local</strong></td>
+            <td>Variables creadas dentro de la función activa actual. Mueren cuando la función termina.</td>
+            <td>El <strong>Limbo</strong> (el rincón más profundo del subconsciente).</td>
+          </tr>
+          <tr>
+            <td><strong>E - Enclosing</strong></td>
+            <td>Variables de las funciones exteriores que envuelven a la función actual.</td>
+            <td>Los <strong>Niveles de Sueño 1, 2 y 3</strong> (París, Hotel, Fortaleza).</td>
+          </tr>
+          <tr>
+            <td><strong>G - Global</strong></td>
+            <td>Variables definidas en la raíz del archivo/módulo (fuera de toda función).</td>
+            <td>La <strong>Realidad</strong> (el avión Boeing 747 volando sobre el océano).</td>
+          </tr>
+          <tr>
+            <td><strong>B - Built-in</strong></td>
+            <td>Nombres reservados del propio lenguaje Python (<code>print</code>, <code>len</code>,
+              <code>range</code>).</td>
+            <td>Las <strong>Leyes de la Física</strong> universales.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin: 26px 0 12px; font-size: 1.2rem; color: var(--accent-purple);">La Arquitectura del Código:
+        <code>scope_inception.py</code></h3>
+      <p>
+        Abre el archivo <code>git/practica-inception-2026/scope_inception.py</code>. Observarás cómo cada función
+        anidada representa un nivel de sueño más profundo:
+      </p>
+
+      <div class="inception-layers">
+        <div class="layer-card global">
+          <div class="layer-title">
+            <span>✈️ Nivel 0: REALIDAD (Mundo Exterior)</span>
+            <span class="layer-scope-badge">GLOBAL</span>
+          </div>
+          <code>x = "Real World"</code>
+        </div>
+        <div class="layer-card enclosing-1">
+          <div class="layer-title">
+            <span>🌧️ Nivel 1: SUEÑO EN PARÍS (Yusuf / Lluvia)</span>
+            <span class="layer-scope-badge">ENCLOSING 1</span>
+          </div>
+          <code>x = "Dream Level 1: Paris"</code>
+        </div>
+        <div class="layer-card enclosing-2">
+          <div class="layer-title">
+            <span>🏨 Nivel 2: SUEÑO EN EL HOTEL (Arthur / Gravedad Cero)</span>
+            <span class="layer-scope-badge">ENCLOSING 2</span>
+          </div>
+          <code>x = "Dream Level 2: Hotel"</code>
+        </div>
+        <div class="layer-card enclosing-3">
+          <div class="layer-title">
+            <span>❄️ Nivel 3: FORTALEZA DE NIEVE (Eames / Nieve)</span>
+            <span class="layer-scope-badge">ENCLOSING 3</span>
+          </div>
+          <code>x = "Dream Level 3: Snow Fortress"</code>
+        </div>
+        <div class="layer-card limbo">
+          <div class="layer-title">
+            <span>🌀 Nivel 4: EL LIMBO (El Abismo Profundo)</span>
+            <span class="layer-scope-badge">LOCAL</span>
+          </div>
+          <code>global x | nonlocal_real_world_x = x</code>
+        </div>
+      </div>
+
+      <h3 style="margin: 26px 0 10px; font-size: 1.15rem; color: var(--brand);">El Efecto Mágico: <code>global</code> vs
+        <code>nonlocal</code></h3>
+      <p>
+        ¿Qué ocurre cuando estamos en lo más hondo del Limbo?
+      </p>
+      <ul style="margin: 10px 0 16px 24px;">
+        <li>
+          <strong>La palabra clave <code>global x</code>:</strong> Salta mágicamente todos los sueños intermedios (la
+          nieve, el hotel y París) y <strong>modifica directamente el mundo real en el avión</strong>
+          (<code>x = "Real World, but altered"</code>).
+        </li>
+        <li>
+          <strong>La palabra clave <code>nonlocal</code>:</strong> Permite tomar una variable de la función envolvente
+          inmediata (el Nivel 3 de la nieve) y modificarla sin alterar el mundo real exterior.
+        </li>
+      </ul>
+
+      <p>Pruébalo ejecutándolo directamente en tu terminal:</p>
+      <div class="code-container">
+        <div class="code-header">
+          <span>Ejecutar script en Terminal</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+        <pre><code>python3 git/practica-inception-2026/scope_inception.py</code></pre>
+      </div>
+
+      <div class="code-container">
+        <div class="code-header"><span>Salida en pantalla</span></div>
+        <pre><code>In the Real World, starting to dream...
+In Dream Level 1: Paris, starting to go deeper...
+In Dream Level 2: Hotel, starting to go deeper...
+In Dream Level 3: Snow Fortress, starting to go deeper...
+In Limbo, reality is: Real World
+In Limbo, after altering reality, the Dream Level 3 is: Real World, but altered
+Back in Dream Level 3: Snow Fortress, after Limbo.
+Back in Dream Level 2: Hotel, after Dream Level 3.
+Back in Dream Level 1: Paris, after Dream Level 2.
+Back in the Real World, but altered.</code></pre>
+      </div>
+      <p style="font-size: 0.92rem; color: var(--accent-amber);">
+        ¡Fíjate en la última línea! Cuando despertamos de todos los niveles, la realidad ya no es `"Real World"`, sino
+        `"Real World, but altered"`. La alteramos desde el fondo del subconsciente.
+      </p>
+    </section>
+
+    <!-- =====================================================================
+         MÓDULO 3: LA TAREA DEL ALUMNO
+         ===================================================================== -->
+    <section class="section-module" id="modulo-3">
+      <div class="section-header">
+        <div class="step-number">3</div>
+        <div>
+          <h2 class="section-title">La Tarea: Tu Análisis Personal de Scopes</h2>
+          <p class="section-desc">Cómo realizar tu aportación respetando el código para evitar conflictos al fusionar 14
+            ramas.</p>
+        </div>
+      </div>
+
+      <p>
+        En la carpeta <code>git/practica-inception-2026/soluciones/</code> tienes a tu disposición <strong>6 variantes
+          avanzadas</strong> desarrolladas como referencia técnica (orientadas a objetos con tótems, generadores con
+        <code>yield</code> para "The Kick", <code>with</code> context managers con Yusuf, etc.).
+      </p>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          ¡Atención! La regla de oro para la fusión grupal
+        </div>
+        <p>
+          En este bootcamp somos <strong>14 alumnos</strong>. Si cada alumno reescribe y destruye el código de forma
+          completamente diferente, cuando el profesor intente fusionar las 14 ramas en <code>main</code>, se producirá
+          un infierno de conflictos inasumibles.
+        </p>
+        <p style="margin-top: 8px;">
+          Por lo tanto, la <strong>mejora obligatoria</strong> consiste en <strong>documentar y enriquecer el archivo
+            con tu análisis firmado</strong>.
+        </p>
+      </div>
+
+      <h3 style="margin: 20px 0 10px; font-size: 1.15rem; color: var(--brand);">Instrucciones exactas para tu cambio:
+      </h3>
+      <ol style="margin: 12px 0 18px 24px; line-height: 1.9;">
+        <li>Abre el archivo <code>git/practica-inception-2026/scope_inception.py</code> en tu editor.</li>
+        <li>
+          En la parte superior o justo antes de la función <code>limbo()</code>, añade un bloque de comentarios con tu
+          <strong>nombre y apellidos completo</strong> delante:
+          <div class="code-container">
+            <div class="code-header"><span>Ejemplo de comentario a insertar</span></div>
+            <pre><code># ==============================================================================
+# ALUMNO: [TU NOMBRE Y APELLIDOS AQUÍ]
+# REFLEXIÓN DE SCOPES:
+# El uso de 'global' aquí permite alterar la variable 'x' de la realidad
+# desde el Limbo, saltándose los niveles de sueño 1, 2 y 3.
+# Por su parte, 'nonlocal' permite comunicarse con el nivel inmediatamente
+# superior sin contaminar la realidad global exterior.
+# En producción, abusar de 'global' genera efectos secundarios peligrosos
+# porque una función oculta puede alterar el estado de todo el sistema.
+# ==============================================================================</code></pre>
+          </div>
+        </li>
+        <li>Guarda el archivo y vuelve a ejecutarlo
+          (<code>python3 git/practica-inception-2026/scope_inception.py</code>) para verificar que no has roto la
+          sintaxis y sigue imprimiendo los sueños perfectamente.</li>
+      </ol>
+    </section>
+
+    <!-- =====================================================================
+         MÓDULO 4: CICLO LOCAL DE GIT
+         ===================================================================== -->
+    <section class="section-module" id="modulo-4">
+      <div class="section-header">
+        <div class="step-number">4</div>
+        <div>
+          <h2 class="section-title">Ciclo Local de Git y tu Mejor Amigo: <code>git log</code></h2>
+          <p class="section-desc">Del Staging Area al árbol genealógico de commits con visualización gráfica.</p>
+        </div>
+      </div>
+
+      <p>
+        Ya has modificado el archivo en tu disco duro. Ahora vamos a registrar ese cambio en el historial inmutable de
+        Git en dos pasos:
+      </p>
+
+      <div class="callout">
+        <div class="callout-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+          1. <code>git add</code>: La Zona de Preparación (Staging Area)
+        </div>
+        <p>
+          Guardar un archivo en el editor no significa que Git lo haya fotografiado. Con <code>git add</code> le dices a
+          Git: <em>"Pon este archivo en la bandeja de salida para el próximo envío"</em>.
+        </p>
+        <div class="code-container">
+          <div class="code-header">
+            <span>Terminal / Git Bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+          </div>
+          <pre><code>git status
+git add git/practica-inception-2026/scope_inception.py</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-success">
+        <div class="callout-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 14 14"></polyline>
+          </svg>
+          2. <code>git commit</code>: La Foto Inmutable
+        </div>
+        <p>
+          Un <strong>commit</strong> es una instantánea permanente en la historia del proyecto. Requiere un mensaje
+          claro que explique el <em>qué</em> y el <em>por qué</em>:
+        </p>
+        <div class="code-container">
+          <div class="code-header">
+            <span>Terminal / Git Bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+          </div>
+          <pre><code>git commit -m "docs(inception): analisis y reflexiones sobre scopes por Tu Nombre"</code></pre>
+        </div>
+      </div>
+
+      <h3 style="margin: 28px 0 12px; font-size: 1.25rem; color: var(--accent-cyan);">Presentamos a tu Mejor Amigo: El
+        Árbol Gráfico de Git</h3>
+      <p>
+        Muchos estudiantes se sienten perdidos porque no "ven" las ramas. Memoriza este comando, porque te acompañará el
+        resto de tu carrera como desarrollador:
+      </p>
+
+      <div class="code-container">
+        <div class="code-header">
+          <span>Comando Maestro de Inspección</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+        <pre><code>git log --graph --all --oneline</code></pre>
+      </div>
+
+      <p>¿Qué hace cada una de estas opciones mágicas?</p>
+      <ul style="margin: 10px 0 16px 24px;">
+        <li><strong><code>--graph</code></strong>: Dibuja con líneas y asteriscos las bifurcaciones y uniones de las
+          ramas en texto ASCII.</li>
+        <li><strong><code>--all</code></strong>: Te muestra TODAS las ramas del repositorio (tanto las locales tuyas
+          como las remotas de GitHub), no solo en la que estás colocado.</li>
+        <li><strong><code>--oneline</code></strong>: Condensa cada commit a una sola línea limpia (hash corto +
+          mensaje).</li>
+      </ul>
+
+      <div class="code-container">
+        <div class="code-header"><span>Ejemplo visual de lo que verás en tu consola</span></div>
+        <pre><code>* 7f2a1b9 (HEAD -> feature/inception-tu-nombre) docs(inception): analisis y reflexiones sobre scopes por Tu Nombre
+|
+* daff28d (origin/main, origin/HEAD, main) generar laboratorio con docker y clase inicial
+* ba7e45d git reset and git partial deployments
+* 34a44ba practica deployhs git</code></pre>
+      </div>
+      <p style="font-size: 0.92rem; color: var(--accent-green);">
+        ¡Observa la magia! Tu rama (<code>HEAD -> feature/...</code>) está un commit por delante de <code>main</code>.
+        Acabas de ver en vivo la divergencia de tu universo paralelo.
+      </p>
+    </section>
+
+    <!-- =====================================================================
+         MÓDULO 5: PULL REQUEST Y COMMITTERS
+         ===================================================================== -->
+    <section class="section-module" id="modulo-5">
+      <div class="section-header">
+        <div class="step-number">5</div>
+        <div>
+          <h2 class="section-title">Subir la Rama, Committers y el Pull Request</h2>
+          <p class="section-desc">Cómo colaborar en GitHub bajo una rama main protegida profesionalmente.</p>
+        </div>
+      </div>
+
+      <h3 style="margin: 20px 0 10px; font-size: 1.15rem; color: var(--brand);">1. ¿Qué es un Committer / Colaborador?
+      </h3>
+      <p>
+        Cualquier persona en Internet puede ver un repositorio público, pero <strong>solo los committers autorizados
+          tienen permiso para subir código</strong>.
+      </p>
+      <div class="callout callout-warning">
+        <div class="callout-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
+          </svg>
+          Requisito Previo Imprescindible: Facilitar tu usuario de GitHub
+        </div>
+        <p>
+          Para que el comando <code>git push</code> funcione y no te devuelva un error de <em>"Permission to ... denied
+            to user"</em>, <strong>debes haberle pasado tu nombre de usuario de GitHub al profesor</strong> para que te
+          envíe una invitación de colaborador al repositorio oficial. Revisa tu correo o las notificaciones de GitHub
+          para aceptar la invitación antes de subir tu rama.
+        </p>
+      </div>
+
+      <h3 style="margin: 26px 0 10px; font-size: 1.15rem; color: var(--accent-purple);">2. ¿Por qué el profesor ha
+        protegido la rama <code>main</code>?</h3>
+      <p>
+        En proyectos profesionales reales (en Google, Microsoft, bancos, startups), <strong>nadie puede hacer
+          <code>git push origin main</code> directamente</strong>.
+      </p>
+      <p style="margin-top: 8px;">
+        El profesor ha activado las <strong>Reglas de Protección de Ramas (*Branch Protection Rules*)</strong> en
+        GitHub:
+      </p>
+      <ul style="margin: 10px 0 14px 24px;">
+        <li>Se bloquea el push directo sobre <code>main</code> para evitar que un despiste borre el trabajo común.</li>
+        <li>Se exige obligatoriamente un <strong>Pull Request (PR)</strong> y la aprobación de un revisor humano (el
+          profesor).</li>
+        <li>Esto garantiza la calidad del código, fomenta la revisión por pares (*Code Review*) y previene desastres.
+        </li>
+      </ul>
+
+      <h3 style="margin: 26px 0 10px; font-size: 1.15rem; color: var(--accent-green);">3. Subir tu rama a GitHub</h3>
+      <p>
+        Sube tu rama local al servidor en la nube ejecutando:
+      </p>
+
+      <div class="code-container">
+        <div class="code-header">
+          <span>Subir rama personal</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+        <pre><code>git push -u origin feature/inception-tu-nombre-apellido</code></pre>
+      </div>
+      <p style="font-size: 0.88rem; color: var(--text-muted);">
+        * La opción <code>-u</code> (o <code>--set-upstream</code>) enlaza tu rama local con una rama idéntica en GitHub
+        para que en el futuro solo tengas que escribir <code>git push</code> o <code>git pull</code>.
+      </p>
+
+      <h3 style="margin: 26px 0 10px; font-size: 1.15rem; color: var(--brand);">4. Abrir el Pull Request (PR) en GitHub
+      </h3>
+      <p>
+        Un <strong>Pull Request</strong> es una solicitud formal donde le dices al dueño del proyecto: <em>"Oye, he
+          terminado mi mejora en mi rama personal; por favor, revísala y fúndela (*merge*) dentro de tu rama main"</em>.
+      </p>
+
+      <div class="callout callout-success">
+        <div class="callout-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="18" r="3"></circle>
+            <circle cx="6" cy="6" r="3"></circle>
+            <path d="M13 6h3a2 2 0 0 1 2 2v7"></path>
+            <line x1="6" y1="9" x2="6" y2="21"></line>
+          </svg>
+          Paso a paso en la web de GitHub:
+        </div>
+        <ol style="margin: 10px 0 10px 24px; line-height: 1.9;">
+          <li>Entra en el repositorio: <a href="https://github.com/fjbanezares/ufv-bootcamp-2026" target="_blank"
+              style="color: var(--brand); font-weight: 700;">https://github.com/fjbanezares/ufv-bootcamp-2026</a>.</li>
+          <li>Verás un aviso amarillo arriba con tu rama y un botón verde que dice <strong>"Compare & pull
+              request"</strong>. Haz clic en él. (Si no aparece, ve a la pestaña <strong>Pull requests</strong> y pulsa
+            <strong>"New pull request"</strong>).</li>
+          <li>
+            Verifica que las flechas apunten en la dirección correcta:
+            <br>
+            <code>base: main</code> &nbsp;←&nbsp; <code>compare: feature/inception-tu-nombre-apellido</code>
+          </li>
+          <li>
+            Escribe un título profesional:
+            <br>
+            <code>feat(inception): análisis de scopes y reflexiones por Tu Nombre</code>
+          </li>
+          <li>
+            En la caja de descripción redacta un breve resumen explicando qué has comentado y qué has aprendido.
+          </li>
+          <li>Haz clic en el botón verde <strong>"Create pull request"</strong>.</li>
+        </ol>
+      </div>
+
+      <p style="margin-top: 14px;">
+        En cuanto lo crees, el profesor recibirá una notificación, inspeccionará tus cambios en la pestaña <em>Files
+          changed</em> y hará clic en <strong>Merge pull request</strong> para incorporar tu análisis a la rama maestra
+        de la clase.
+      </p>
+    </section>
+
+    <!-- =====================================================================
+         MÓDULO 6: ENTREGABLE EN CANVAS Y RÚBRICA
+         ===================================================================== -->
+    <section class="section-module" id="modulo-6">
+      <div class="section-header">
+        <div class="step-number">6</div>
+        <div>
+          <h2 class="section-title">Entrega Oficial y Rúbrica en Canvas</h2>
+          <p class="section-desc">Los dos requisitos que debes entregar en la tarea de Canvas para ser evaluado.</p>
+        </div>
+      </div>
+
+      <div class="checklist-box">
+        <div class="checklist-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          Checklist de Entrega Obligatoria
+        </div>
+
+        <div class="checklist-item">
+          <input type="checkbox" class="checklist-checkbox" id="check-1">
+          <label for="check-1">
+            <strong>1. Enlace al Pull Request en GitHub:</strong> La URL completa de tu PR abierto (ejemplo:
+            <code>https://github.com/fjbanezares/ufv-bootcamp-2026/pull/X</code>).
+          </label>
+        </div>
+
+        <div class="checklist-item">
+          <input type="checkbox" class="checklist-checkbox" id="check-2">
+          <label for="check-2">
+            <strong>2. Vídeo de Reflexión (&lt; 1 minuto):</strong> Un enlace o archivo de vídeo breve (grabado con
+            Loom, Teams, tu teléfono o grabador de pantalla) respondiendo con sinceridad a:
+            <br>
+            <em>* ¿Cómo te has sentido trabajando con ramas independientes sin miedo a romper el proyecto?</em>
+            <br>
+            <em>* ¿Has comprobado la potencia de Git y los Pull Requests para colaborar en equipo de forma
+              ordenada?</em>
+          </label>
+        </div>
+      </div>
+
+      <h3 style="margin: 28px 0 12px; font-size: 1.15rem; color: var(--brand);">Criterios de Evaluación (10 Puntos)</h3>
+      <div class="rubric-grid">
+        <div class="rubric-card">
+          <div class="rubric-pts">3.0 Pts</div>
+          <div class="rubric-desc"><strong>Flujo de Ramas y Git:</strong> Creación impecable de la rama, commits con
+            mensajes claros y uso de <code>git push</code>.</div>
+        </div>
+        <div class="rubric-card">
+          <div class="rubric-pts">3.0 Pts</div>
+          <div class="rubric-desc"><strong>Comprensión de Scopes:</strong> Análisis en el código de <code>global</code>
+            y <code>nonlocal</code> sin generar conflictos destructivos.</div>
+        </div>
+        <div class="rubric-card">
+          <div class="rubric-pts">2.0 Pts</div>
+          <div class="rubric-desc"><strong>Pull Request Profesional:</strong> Título descriptivo, explicación de cambios
+            y correcto apuntado hacia <code>main</code>.</div>
+        </div>
+        <div class="rubric-card">
+          <div class="rubric-pts">2.0 Pts</div>
+          <div class="rubric-desc"><strong>Vídeo de Reflexión:</strong> Expresión clara y concisa (&lt; 60 seg) sobre la
+            experiencia con Git colaborativo.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="canvas-footer">
+      <p>Bootcamp UFV 2026 · Universidad Francisco de Vitoria · Madrid</p>
+      <p style="margin-top: 4px;">Diseñado para la formación de futuros ingenieros y desarrolladores de software.</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // Copy to clipboard helper
+    function copyCode(btn) {
+      const container = btn.closest('.code-container');
+      const code = container.querySelector('pre code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = '¡Copiado!';
+        btn.style.background = 'var(--accent-green)';
+        btn.style.color = '#0b0f19';
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 2000);
+      });
+    }
+
+    // Theme toggler (Dark / Light)
+    function toggleTheme() {
+      const body = document.body;
+      const themeText = document.getElementById('theme-text');
+      const isLight = body.getAttribute('data-theme') === 'light';
+
+      if (isLight) {
+        body.removeAttribute('data-theme');
+        themeText.innerText = 'Modo Claro';
+      } else {
+        body.setAttribute('data-theme', 'light');
+        themeText.innerText = 'Modo Oscuro';
+      }
+    }
+  </script>
+</body>
+
+</html>
