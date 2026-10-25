@@ -1,31 +1,50 @@
-x = "Real World"  # This is the global variable
+
+# ALUMNO: [Adrián García Fontanet]
+# PRACTICA: EL DESAFIO INCEPTION - GIT Y PYTHON SCOPES
+#
+# Reflexion:
+# La palabra clave global permite modificar una variable definida
+# fuera de todas las funciones.
+# La palabra clave nonlocal permite modificar una variable definida
+# en una funcion exterior, pero no global.
+# El orden de busqueda de variables en Python es LEGB:
+# Local, Enclosing, Global y Built-in.
+
+
+x = "Real World"  # Variable global
 
 
 def dream_level_1():
-    x = "Dream Level 1: Paris"  # local variable to dream_level_1
+    x = "Dream Level 1: Paris"
 
     def dream_level_2():
-        x = "Dream Level 2: Hotel"  # local variable to dream_level_2
+        x = "Dream Level 2: Hotel"
 
         def dream_level_3():
-            x = "Dream Level 3: Snow Fortress"  # local variable to dream_level_3
+            dream_level_3_x = "Dream Level 3: Snow Fortress"
 
             def limbo():
-                global x  # Declare global first before using the name x in any way.
+                global x
+                nonlocal dream_level_3_x
+
                 print(f"In Limbo, reality is: {x}")
-                x = "Real World, but altered"  # modifying global reality
 
-                nonlocal_real_world_x = x  # This refers to Dream Level 3's x
+                # Modificamos la variable global.
+                x = "Real World, but altered"
+
                 print(
-                    f"In Limbo, after altering reality, the Dream Level 3 is: {nonlocal_real_world_x}"
-                )
-                nonlocal_real_world_x = (
-                    "Dream Level 3, but altered"  # modifying the dream level 3 reality
+                    f"In Limbo, the Dream Level 3 is: "
+                    f"{dream_level_3_x}"
                 )
 
-            print(f"In {x}, starting to go deeper...")
+                # Modificamos la variable del nivel exterior.
+                dream_level_3_x = "Dream Level 3, but altered"
+
+            print(
+                f"In {dream_level_3_x}, starting to go deeper..."
+            )
             limbo()
-            print(f"Back in {x}, after Limbo.")
+            print(f"Back in {dream_level_3_x}, after Limbo.")
 
         print(f"In {x}, starting to go deeper...")
         dream_level_3()
