@@ -10,7 +10,7 @@ def dream_level_1():
         def dream_level_3():
             x = "Dream Level 3: Snow Fortress"  # local variable to dream_level_3
             # ==============================================================================
-            # ALUMNO: Elba Pérez de Cortabitarte
+            # ALUMNO: Elba Pérez de Cortabitarte 
             # REFLEXIÓN DE SCOPES:
             # Hola profe. En este ejemplo, 'global' permite cambiar la variable x que se definió
             # al principio del programa, aunque estemos dentro de varias funciones.
