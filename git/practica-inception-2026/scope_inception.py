@@ -1,3 +1,28 @@
+# ==============================================================================
+# ALUMNA: María Rozas Casero
+# REFLEXIÓN DE SCOPES:
+# El programa de Python va a buscar los nombres siguiendo el orden LEGB establecido.
+# Se entiende por LEGB Local, Enclosing de funciones envolventes, Global y Built-in de nombres incorporados.
+#
+# En la función limbo(), la instrucción global x indica que la variable x pertenece al ámbito del módulo.
+# Por eso se modifica la realidad global, mientras que las variables x de París, Hotel y 
+# Fortaleza conservan sus valores reales/iniciales.
+#
+# nonlocal_real_world_x es una variable local de la función limbo(). Dicho nombre
+# no equivale a utilizar la instrucción nonlocal. Recibe el valor de
+# la x global y reasignarla no modifica la x de la Fortaleza.
+# Por lo tanto, de este modo los comentarios originales que indican que esa variable
+# modifica el nivel 3 no describen lo que realmente hace el código.
+#
+# Si utilizáramos nonlocal x en lugar de global x, se podría modificar
+# la x de la función envolvente más cercana que la tenga definida:
+# en este caso sería dream_level_3(). La variable global no cambiaría.
+#
+# Modificar variables globales puede crear efectos secundarios/colaterales y
+# dificultar las pruebas. Utilizar parámetros y devolver resultados
+# suele facilitar la comprensión y el mantenimiento de nuestro programa.
+# ==============================================================================
+
 x = "Real World"  # This is the global variable
 
 
