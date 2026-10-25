@@ -1,4 +1,26 @@
+# ==========================================================
+# ALUMNO: Arturo Santiago Santos García
+# REFLEXIÓN DE SCOPES:
+#
+# Python busca los nombres siguiendo el orden LEGB:
+# local, funciones exteriores, global e incorporados.
+#
+# En limbo(), global x permite acceder a la x del archivo.
+# Al cambiar su valor, se modifica la realidad global,
+# pero no las variables x propias de los otros sueños.
+#
+# nonlocal x permitiría modificar la x de la función
+# exterior más cercana que la tenga definida.
+#
+# En este código, nonlocal_real_world_x es una variable
+# local: su nombre no equivale a usar la palabra nonlocal
+# y asignarle un valor no modifica la x del nivel 3.
+#
+# Usar muchas variables globales puede dificultar entender
+# qué función ha cambiado un dato y provocar errores.
+# ==========================================================
 x = "Real World"  # This is the global variable
+
 
 
 def dream_level_1():
