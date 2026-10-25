@@ -9,7 +9,19 @@ def dream_level_1():
 
         def dream_level_3():
             x = "Dream Level 3: Snow Fortress"  # local variable to dream_level_3
-
+            # ============================================================
+            # ALUMNA: Nirvana Falcón Puebla
+            # REFLEXIÓN DE SCOPES:
+            # 'global x' permite acceder a la variable x definida en el
+            # ámbito global y modificar la realidad exterior desde limbo.
+            # 'nonlocal' permite modificar una variable de una función
+            # envolvente, sin cambiar la variable global.
+            # En este ejemplo, nonlocal x dentro de limbo permitiría
+            # modificar la x de dream_level_3, mientras que global x
+            # modifica la x global. Son ámbitos distintos.
+            # En producción, abusar de global puede generar efectos
+            # secundarios difíciles de detectar y mantener.
+            # ============================================================
             def limbo():
                 global x  # Declare global first before using the name x in any way.
                 print(f"In Limbo, reality is: {x}")
