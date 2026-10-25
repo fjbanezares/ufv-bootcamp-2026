@@ -1,5 +1,12 @@
-x = "Real World"  # This is the global variable
+# ALUMNO: Alejandro Arias Sanjuán
 
+# REFLEXIÓN:
+# En este programa hay varias funciones dentro de otras, y cada una tiene su propia variable x, que representa un nivel diferente de sueño.
+# Al utilizar global x dentro de limbo(), podemos modificar la variable x del mundo real, aunque estemos dentro de varias funciones.
+# Por otro lado, nonlocal permite modificar una variable de una función exterior que contiene a la función actual, sin modificar la variable global.
+# Utilizar muchas variables globales puede provocar errores, porque una función puede cambiar valores que también utilizan otras funciones.
+
+x = "Real World"  # This is the global variable
 
 def dream_level_1():
     x = "Dream Level 1: Paris"  # local variable to dream_level_1
