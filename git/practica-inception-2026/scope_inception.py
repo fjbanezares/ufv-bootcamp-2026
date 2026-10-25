@@ -1,4 +1,24 @@
+# ============================================================
+# ALUMNA: Cristina Mesa
+# REFLEXIÓN SOBRE SCOPES:
+# Cada función de sueño tiene su propia variable x.
+# En limbo(), global x indica que usamos la variable del módulo,
+# por lo que la asignación cambia la realidad a "Real World, but altered".
+# Las variables x de París, Hotel y Fortaleza conservan sus valores.
+#
+# Si sustituyéramos global x por nonlocal x, se utilizaría la x
+# de la función envolvente más cercana que la define: dream_level_3.
+# Así cambiaría la Fortaleza, mientras la variable global seguiría
+# valiendo "Real World".
+#
+# La variable nonlocal_real_world_x es una variable local:
+# su nombre no equivale a utilizar la palabra clave nonlocal.
+# Abusar de global puede causar cambios inesperados y dificultar
+# entender y probar las funciones porque comparten estado.
+# ============================================================
+
 x = "Real World"  # This is the global variable
+
 
 
 def dream_level_1():
