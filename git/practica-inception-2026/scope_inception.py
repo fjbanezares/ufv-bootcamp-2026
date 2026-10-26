@@ -1,3 +1,18 @@
+
+
+# ALUMNO: [Adrián García Fontanet]
+# PRACTICA: EL DESAFIO INCEPTION - GIT Y PYTHON SCOPES
+#
+# Reflexion:
+# La palabra clave global permite modificar una variable definida
+# fuera de todas las funciones.
+# La palabra clave nonlocal permite modificar una variable definida
+# en una funcion exterior, pero no global.
+# El orden de busqueda de variables en Python es LEGB:
+# Local, Enclosing, Global y Built-in.
+
+
+
 # ALUMNO: Alejandro Arias Sanjuán
 
 # REFLEXIÓN:
@@ -10,15 +25,18 @@
 # Utilizar muchas variables globales puede provocar errores, porque una función puede cambiar valores que también
 # utilizan otras funciones.
 
+
 x = "Real World"  # This is the global variable
 
 def dream_level_1():
-    x = "Dream Level 1: Paris"  # local variable to dream_level_1
+    x = "Dream Level 1: Paris"
 
     def dream_level_2():
-        x = "Dream Level 2: Hotel"  # local variable to dream_level_2
+        x = "Dream Level 2: Hotel"
 
         def dream_level_3():
+
+          #  dream_level_3_x = "Dream Level 3: Snow Fortress" <<<<<<< feature/inception-adrian-garcia
             x = "Dream Level 3: Snow Fortress"  # local variable to dream_level_3
             
             # ============================================================
@@ -51,9 +69,20 @@ def dream_level_1():
             # secundarios inesperados.
             # ======================================================================
 
+
             def limbo():
-                global x  # Declare global first before using the name x in any way.
+                global x
+                nonlocal dream_level_3_x
+
                 print(f"In Limbo, reality is: {x}")
+ 
+              #feature/inception-adrian-garcia
+                # Modificamos la variable global.
+               # x = "Real World, but altered"
+
+              #  print(
+              #      f"In Limbo, the Dream Level 3 is: "
+              #      f"{dream_level_3_x}"
                 x = "Real World, but altered"  # modifying global reality
                 # Aunque su nombre contiene "nonlocal", esta es una variable local de limbo().
                 # Guarda el valor de la x global porque arriba se ha declarado "global x".
@@ -67,9 +96,14 @@ def dream_level_1():
                     "Dream Level 3, but altered"  # Cambia solo la variable local; no modifica la x de dream_level_3().
                 )
 
-            print(f"In {x}, starting to go deeper...")
+                # Modificamos la variable del nivel exterior.
+                dream_level_3_x = "Dream Level 3, but altered"
+
+            print(
+                f"In {dream_level_3_x}, starting to go deeper..."
+            )
             limbo()
-            print(f"Back in {x}, after Limbo.")
+            print(f"Back in {dream_level_3_x}, after Limbo.")
 
         print(f"In {x}, starting to go deeper...")
         dream_level_3()
