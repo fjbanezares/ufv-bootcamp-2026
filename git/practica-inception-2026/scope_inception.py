@@ -21,6 +21,20 @@ def dream_level_1():
         def dream_level_3():
             x = "Dream Level 3: Snow Fortress"  # local variable to dream_level_3
 
+            # ======================================================================
+            # ALUMNO: Ignacio Camarena Gómez
+            # REFLEXIÓN DE SCOPES:
+            # En limbo(), `global x` hace que la lectura y la asignación de x
+            # apunten a la variable del módulo, saltándose los x locales de los
+            # niveles anteriores. Por eso, al despertar, la realidad queda alterada.
+            # La asignación `nonlocal_real_world_x = x` de este ejemplo no usa la
+            # palabra clave `nonlocal`: crea otra variable local y no modifica el x
+            # de Snow Fortress. Con `nonlocal`, una función anidada puede modificar
+            # una variable de su función envolvente; no puede declararse `global x`
+            # y `nonlocal x` a la vez en el mismo ámbito. En producción, abusar de
+            # `global` dificulta rastrear cambios de estado y puede causar efectos
+            # secundarios inesperados.
+            # ======================================================================
             def limbo():
                 global x  # Declare global first before using the name x in any way.
                 print(f"In Limbo, reality is: {x}")
