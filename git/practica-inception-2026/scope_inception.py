@@ -1,4 +1,5 @@
 
+
 # ALUMNO: [Adrián García Fontanet]
 # PRACTICA: EL DESAFIO INCEPTION - GIT Y PYTHON SCOPES
 #
@@ -11,8 +12,21 @@
 # Local, Enclosing, Global y Built-in.
 
 
-x = "Real World"  # Variable global
 
+# ALUMNO: Alejandro Arias Sanjuán
+
+# REFLEXIÓN:
+# En este programa hay varias funciones dentro de otras, y cada una tiene su propia variable x,
+# que representa un nivel diferente de sueño.
+# Al utilizar global x dentro de limbo(), podemos modificar la variable x del mundo real, aunque estemos dentro de varias
+# funciones.
+# Por otro lado, nonlocal permite modificar una variable de una función exterior que contiene a la función actual, 
+# sin modificar la variable global.
+# Utilizar muchas variables globales puede provocar errores, porque una función puede cambiar valores que también
+# utilizan otras funciones.
+
+
+x = "Real World"  # This is the global variable
 
 def dream_level_1():
     x = "Dream Level 1: Paris"
@@ -21,20 +35,65 @@ def dream_level_1():
         x = "Dream Level 2: Hotel"
 
         def dream_level_3():
-            dream_level_3_x = "Dream Level 3: Snow Fortress"
+
+          #  dream_level_3_x = "Dream Level 3: Snow Fortress" <<<<<<< feature/inception-adrian-garcia
+            x = "Dream Level 3: Snow Fortress"  # local variable to dream_level_3
+            
+            # ============================================================
+            # ALUMNA: Nirvana Falcón Puebla
+            # REFLEXIÓN DE SCOPES:
+            # 'global x' permite acceder a la variable x definida en el
+            # ámbito global y modificar la realidad exterior desde limbo.
+            # 'nonlocal' permite modificar una variable de una función
+            # envolvente, sin cambiar la variable global.
+            # En este ejemplo, nonlocal x dentro de limbo permitiría
+            # modificar la x de dream_level_3, mientras que global x
+            # modifica la x global. Son ámbitos distintos.
+            # En producción, abusar de global puede generar efectos
+            # secundarios difíciles de detectar y mantener.
+            # ============================================================
+
+
+            # ======================================================================
+            # ALUMNO: Ignacio Camarena Gómez
+            # REFLEXIÓN DE SCOPES:
+            # En limbo(), `global x` hace que la lectura y la asignación de x
+            # apunten a la variable del módulo, saltándose los x locales de los
+            # niveles anteriores. Por eso, al despertar, la realidad queda alterada.
+            # La asignación `nonlocal_real_world_x = x` de este ejemplo no usa la
+            # palabra clave `nonlocal`: crea otra variable local y no modifica el x
+            # de Snow Fortress. Con `nonlocal`, una función anidada puede modificar
+            # una variable de su función envolvente; no puede declararse `global x`
+            # y `nonlocal x` a la vez en el mismo ámbito. En producción, abusar de
+            # `global` dificulta rastrear cambios de estado y puede causar efectos
+            # secundarios inesperados.
+            # ======================================================================
+
 
             def limbo():
                 global x
                 nonlocal dream_level_3_x
 
                 print(f"In Limbo, reality is: {x}")
-
+ 
+              #feature/inception-adrian-garcia
                 # Modificamos la variable global.
-                x = "Real World, but altered"
+               # x = "Real World, but altered"
 
+              #  print(
+              #      f"In Limbo, the Dream Level 3 is: "
+              #      f"{dream_level_3_x}"
+                x = "Real World, but altered"  # modifying global reality
+                # Aunque su nombre contiene "nonlocal", esta es una variable local de limbo().
+                # Guarda el valor de la x global porque arriba se ha declarado "global x".
+                # Cambiar nonlocal_real_world_x no modifica la x de dream_level_3().
+                # Para modificar esa x exterior se necesitaría otro enfoque con "nonlocal x".
+                nonlocal_real_world_x = x # Copia el valor de la x global
                 print(
-                    f"In Limbo, the Dream Level 3 is: "
-                    f"{dream_level_3_x}"
+                    f"In Limbo, after altering reality, the Dream Level 3 is: {nonlocal_real_world_x}"
+                )
+                nonlocal_real_world_x = (
+                    "Dream Level 3, but altered"  # Cambia solo la variable local; no modifica la x de dream_level_3().
                 )
 
                 # Modificamos la variable del nivel exterior.
