@@ -1,3 +1,26 @@
+
+# ==============================================================================
+# ALUMNO: Guillermo López-Quiroga Lizarraga
+# REFLEXION DE SCOPES:
+#
+# Los niveles 1, 2 y 3 tienen su propia variable local x, mientras que el Limbo utiliza la variable global x.
+# Python busca las variables siguiendo la regla LEGB.
+#
+# Al utilizar 'global x' dentro del Limbo, podemos modificar la variable
+# de la realidad, aunque estemos dentro de varias funciones anidadas.
+#
+# Por otro lado, 'nonlocal' permite modificar una variable que pertenece
+# a una funcion exterior, sin tener que cambiar una variable global.
+#
+# En este codigo, 'nonlocal_real_world_x' es solo un nombre de variable,
+# no una instruccion 'nonlocal'.
+#
+# Considero que abusar de 'global' puede provocar errores dificiles de
+# detectar, porque una funcion puede modificar datos utilizados por otras.
+# Por eso, es preferible controlar donde se modifican las variables.
+# ==============================================================================
+
+
 # ALUMNO: Alejandro Arias Sanjuán
 
 # REFLEXIÓN:
@@ -9,6 +32,7 @@
 # sin modificar la variable global.
 # Utilizar muchas variables globales puede provocar errores, porque una función puede cambiar valores que también
 # utilizan otras funciones.
+
 
 x = "Real World"  # This is the global variable
 
