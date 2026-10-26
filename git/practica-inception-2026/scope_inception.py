@@ -44,6 +44,20 @@ def dream_level_1():
 
         def dream_level_3():
             x = "Dream Level 3: Snow Fortress"  # local variable to dream_level_3
+
+            # ==============================================================================
+            # ALUMNO: Elba Pérez de Cortabitarte 
+            # REFLEXIÓN DE SCOPES:
+            # Hola profe. En este ejemplo, 'global' permite cambiar la variable x que se definió
+            # al principio del programa, aunque estemos dentro de varias funciones.
+            # Es como si desde el último nivel del sueño pudiéramos modificar
+            # directamente lo que ocurre en la realidad.
+            # En cambio, 'nonlocal' sirve para modificar una variable de una función
+            # superior, sin llegar a cambiar la variable global.
+            # Esto me ayuda a entender por qué es importante saber dónde se define
+            # una variable y qué partes del programa pueden modificarla.
+            # ==============================================================================
+
             
             # ============================================================
             # ALUMNA: Nirvana Falcón Puebla
@@ -74,6 +88,7 @@ def dream_level_1():
             # `global` dificulta rastrear cambios de estado y puede causar efectos
             # secundarios inesperados.
             # ======================================================================
+
 
             def limbo():
                 global x  # Declare global first before using the name x in any way.
